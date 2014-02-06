@@ -1,4 +1,2 @@
 VibroPlayer
 ===========
-
-VibroPlayer Project
