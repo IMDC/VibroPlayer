@@ -14,12 +14,19 @@ Step 2: Plug the PreSonus FireStudio Audio device to the PC using the FireWire c
 The configuration is as follows: 
 
 Channel Input 1: Green Cable
+
 Channel Input 2: Yellow Cable
+
 Channel Input 3: Orange Cable
+
 Channel Input 4: Red Cable
+
 Channel Input 5: Blue Cable
+
 Channel Input 6: Brown Cable
+
 Channel Input 7: Purple Cable
+
 Channel Input 8: Grey Cable
 
 Use the picture below as reference.
@@ -27,9 +34,13 @@ Use the picture below as reference.
 http://i.imgur.com/INy5Wg2.jpg
 
 Step 3: Not really a step, but PLEASE NOTE the configuration below when working with applications/software: 
+
 Channels 1/2 refer to the Top 4 Speakers 
+
 Channels 3/4 refer to the Middle-Top 4 Speakers 
+
 Channels 5/6 refer to the Middle-Bottom 4 Speakers 
+
 Channels 7/8 refer to the Bottom 4 Speakers 
 
 Use the picture below as reference.
