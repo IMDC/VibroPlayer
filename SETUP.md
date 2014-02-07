@@ -35,13 +35,13 @@ http://i.imgur.com/INy5Wg2.jpg
 
 Step 3: Not really a step, but PLEASE NOTE the configuration below when working with applications/software: 
 
-Channels 1/2 refer to the Top 4 Speakers 
+Channels 1/2 refer to the Top 2 Speakers 
 
-Channels 3/4 refer to the Middle-Top 4 Speakers 
+Channels 3/4 refer to the Middle-Top 2 Speakers 
 
-Channels 5/6 refer to the Middle-Bottom 4 Speakers 
+Channels 5/6 refer to the Middle-Bottom 2 Speakers 
 
-Channels 7/8 refer to the Bottom 4 Speakers 
+Channels 7/8 refer to the Bottom 2 Speakers 
 
 Use the picture below as reference.
 
@@ -53,4 +53,4 @@ Step 4: Plug in the power adapters for everything. If you hear noise from the ch
 
 If you successfully installed the drivers, in your sound settings (located in Control Panel\Hardware and Sound\Sound), hit the Playback tab, and make PreSonus FireStudio Audio your default playback device.
     
-Step 5: You should be able to output sound to the four speaker pairings through any software.
+Step 5: You should be able to output sound to the two speaker pairings through any software.
