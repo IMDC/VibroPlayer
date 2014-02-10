@@ -29,7 +29,7 @@ public class SoundsFilter extends FileFilter {
             
             if ( extension != null ) {
                 /* If you want to add more extensions, just change here. */
-                if ( extension.equals ( "mp4" ) ) {
+                if ( extension.equals ( "mp4" ) || extension.equals ( "wav" ) ) {
                     return true;
                 }
                 else {

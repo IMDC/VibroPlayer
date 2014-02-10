@@ -14,17 +14,23 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 
 /**
  *
  * @author imdc
  */
-public class Converter extends javax.swing.JFrame {
+public class Player extends javax.swing.JFrame {
 
     static File channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8;
     
     public static AsioDriver driver;
+    
+    public static double[] output;
     
     AsioSoundHost listener;
     
@@ -33,7 +39,7 @@ public class Converter extends javax.swing.JFrame {
     /**
      * Creates new form NewJFrame
      */
-    public Converter() {
+    public Player() {
         initComponents();
         
         driver = null;
@@ -191,71 +197,99 @@ public class Converter extends javax.swing.JFrame {
         
         playChannel1.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 0 );
+                playChannel1.setText( start ( 0 ) );
+                
+                
+                
             }
         });
         
         playChannel2.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 1 );
+                playChannel2.setText( start ( 1 ) );
             }
         });
         
         playChannel3.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 3 );
+                playChannel3.setText( start ( 2 ) );
             }
         });
         
         playChannel4.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 2 );
+                playChannel4.setText( start ( 3 ) );
             }
         });
         
         playChannel5.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 4 );
+                playChannel5.setText( start ( 4 ) );
             }
         });
         
         playChannel6.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 5 );
+                playChannel6.setText( start ( 5 ) );
             }
         });
         
         playChannel7.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 7 );
+                playChannel7.setText( start ( 6 ) );
             }
         });
         
         playChannel8.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                start ( 6 );
+                playChannel8.setText( start ( 7 ) );
             }
         });
+        
+        WAVFileReader sampleReader = null;
+        
+        /*try {
+            
+            sampleReader = new WAVFileReader ( new File ( "original_test.wav" ) );
+            long nbSamples = sampleReader.getSampleCount();
+            System.out.println ( "nbChannel = " + sampleReader.getFormat().getChannels() );
+            System.out.println ( "frameRate = " + sampleReader.getFormat().getFrameRate() );
+            System.out.println ( "sampleSize = " + sampleReader.getFormat().getSampleSizeInBits() );
+            
+            output = new double[(int) nbSamples];
+            
+            sampleReader.getInterleavedSamples ( 0, nbSamples, output );
+            
+        } catch (UnsupportedAudioFileException e) {
+            System.out.println ( e );
+        } catch (IOException e) {
+            System.out.println ( e );
+        }*/
     }
     
-    private void start ( int channel ) {
-        try{
-            if ( driver.getCurrentState() != AsioDriverState.RUNNING ) {
-                listener = new AsioSoundHost ( driver );
-                driver.start();
-            }
+    private String start ( int channel ) {
         
-            if ( playingChannel[channel] ) {
-                listener.removeChannel ( channel );
-                playingChannel[channel] = false;
-            }
-            else {
-                listener.addChannel ( channel );
-                playingChannel[channel] = true;
-            }
-        }catch (NullPointerException e){
-            System.out.println(e);
-        }        
+        if ( driver.getCurrentState() != AsioDriverState.RUNNING ) {
+            listener = new AsioSoundHost ( driver );
+            driver.start();
+            System.out.println("Driver started.");
+        }
+        
+        if ( playingChannel[channel] ) {
+            listener.removeChannel ( channel );
+            playingChannel[channel] = false;
+            
+            
+            System.out.println(channel + " is off");
+            return "Play";
+        }
+        else {
+            listener.addChannel ( channel );
+            playingChannel[channel] = true;
+            System.out.println(channel + " is on");
+            return "Stop";
+        }
+        
     }
 
     /**
@@ -307,9 +341,9 @@ public class Converter extends javax.swing.JFrame {
         playChannel6 = new javax.swing.JButton();
         playChannel7 = new javax.swing.JButton();
         playChannel8 = new javax.swing.JButton();
+        playAllSoung = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(800, 600));
 
         jLabel1.setFont(new java.awt.Font("Tahoma", 1, 11)); // NOI18N
         jLabel1.setText("Channel 1");
@@ -377,21 +411,28 @@ public class Converter extends javax.swing.JFrame {
 
         controlPanelBtn.setText("Control panel");
 
-        playChannel1.setText("Play/Pause");
+        playChannel1.setText("Play");
 
-        playChannel2.setText("Play/Pause");
+        playChannel2.setText("Play");
 
-        playChannel3.setText("Play/Pause");
+        playChannel3.setText("Play");
 
-        playChannel4.setText("Play/Pause");
+        playChannel4.setText("Play");
 
-        playChannel5.setText("Play/Pause");
+        playChannel5.setText("Play");
 
-        playChannel6.setText("Play/Pause");
+        playChannel6.setText("Play");
 
-        playChannel7.setText("Play/Pause");
+        playChannel7.setText("Play");
 
-        playChannel8.setText("Play/Pause");
+        playChannel8.setText("Play");
+
+        playAllSoung.setText("Play Song");
+        playAllSoung.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                playAllSoungActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -409,72 +450,77 @@ public class Converter extends javax.swing.JFrame {
                             .addComponent(jSeparator2)
                             .addComponent(jSeparator1)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(controlPanelBtn)
-                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel7)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel7)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel7, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel6)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel6)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel6))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel5)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel5)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel5))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel4)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel4)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel4))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel3)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel3)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel3))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel2)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel2)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel2))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel1)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel1)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel1))
-                                        .addGroup(layout.createSequentialGroup()
-                                            .addComponent(jLabel8)
-                                            .addGap(126, 126, 126)
-                                            .addComponent(labelChannel8)
-                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                            .addComponent(fileChannel8))))
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
                                     .addGroup(layout.createSequentialGroup()
-                                        .addGap(33, 33, 33)
-                                        .addComponent(playChannel1))
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(playAllSoung)
+                                        .addGap(124, 124, 124)
+                                        .addComponent(controlPanelBtn))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel7)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel7)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(playChannel2, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(playChannel3, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(playChannel4, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(playChannel5, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(playChannel6, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(playChannel7, javax.swing.GroupLayout.Alignment.TRAILING)
-                                            .addComponent(playChannel8, javax.swing.GroupLayout.Alignment.TRAILING))))
-                                .addGap(0, 3, Short.MAX_VALUE))))
+                                        .addComponent(fileChannel7, javax.swing.GroupLayout.DEFAULT_SIZE, 385, Short.MAX_VALUE))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel6)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel6)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(fileChannel6))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel5)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel5)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(fileChannel5))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel4)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel4)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(fileChannel4))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel3)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel3)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(fileChannel3))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel2)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel2)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(fileChannel2))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel1)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel1)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(fileChannel1))
+                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                        .addComponent(jLabel8)
+                                        .addGap(126, 126, 126)
+                                        .addComponent(labelChannel8)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(fileChannel8)))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createSequentialGroup()
+                                            .addGap(23, 23, 23)
+                                            .addComponent(playChannel1, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                            .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                                .addComponent(playChannel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(playChannel3, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(playChannel4, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(playChannel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(playChannel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(playChannel7, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addGap(23, 23, 23)
+                                        .addComponent(playChannel8, javax.swing.GroupLayout.PREFERRED_SIZE, 63, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(0, 35, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addContainerGap()
                         .addComponent(jSeparator7)))
@@ -553,12 +599,27 @@ public class Converter extends javax.swing.JFrame {
                         .addComponent(playChannel8))
                     .addComponent(jLabel8))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 21, Short.MAX_VALUE)
-                .addComponent(controlPanelBtn)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(controlPanelBtn)
+                    .addComponent(playAllSoung))
                 .addGap(41, 41, 41))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void playAllSoungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playAllSoungActionPerformed
+            
+        start ( 0 );
+        start ( 1 );
+        start ( 2 );
+        start ( 3 );
+        start ( 4 );
+        start ( 5 );
+        start ( 6 );
+        start ( 7 );
+        
+    }//GEN-LAST:event_playAllSoungActionPerformed
 
     private File getFile ( java.awt.event.MouseEvent evt, int idChannel ) {
         JFileChooser fc = new JFileChooser();
@@ -619,20 +680,20 @@ public class Converter extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Converter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Player.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Converter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Player.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Converter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Player.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Converter.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Player.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
         
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Converter().setVisible(true);
+                new Player().setVisible(true);
             }
         });
     }
@@ -670,6 +731,7 @@ public class Converter extends javax.swing.JFrame {
     private javax.swing.JLabel labelChannel6;
     private javax.swing.JLabel labelChannel7;
     private javax.swing.JLabel labelChannel8;
+    private javax.swing.JButton playAllSoung;
     private javax.swing.JButton playChannel1;
     private javax.swing.JButton playChannel2;
     private javax.swing.JButton playChannel3;

@@ -9,10 +9,8 @@ package javaappsoundtest;
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
-import static javaappsoundtest.Converter.driver;
 
 /**
  *
@@ -28,6 +26,9 @@ public class AsioSoundHost implements AsioDriverListener {
     private float[] output;
     
     private boolean[] channel;
+    private long startTime;  
+    
+    private double noteFrequency;
     
     AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
@@ -37,6 +38,7 @@ public class AsioSoundHost implements AsioDriverListener {
             
             bufferSize = this.driver.getBufferPreferredSize();
             sampleRate = this.driver.getSampleRate();
+          
             output = new float[bufferSize];
             activeChannels = new HashSet<AsioChannel>();
             
@@ -55,6 +57,9 @@ public class AsioSoundHost implements AsioDriverListener {
             }
             
             this.driver.createBuffers(activeChannels);
+            
+            startTime = System.nanoTime(); 
+            noteFrequency = 200;
         }
         /* play output to given channel
          */
@@ -73,12 +78,59 @@ public class AsioSoundHost implements AsioDriverListener {
         
         for ( int i = 0; i < bufferSize; i++, sampleIndex++ ) {
             try {
-                output[i] = (float) Math.sin ( 2 * Math.PI * sampleIndex * 100.0 / sampleRate );
-                //System.out.println ( output[i] );
+               //output[i] = (float) Math.sin ( 2 * Math.PI * sampleIndex * 200.0 / sampleRate );
+               
+                output[i] = (float) Math.sin ( noteFrequency * 2 * Math.PI * i / sampleRate );
+                //System.out.println ( sampleRate );
             }
             catch ( Exception e ) {
                 System.out.println ( "EXCEPTION: " + e );
             }
+        }
+        
+        long elapsedTime = ( ( sampleTime - startTime ) / 1000000);
+           
+        if ( elapsedTime > 0 && elapsedTime < 500 ) {
+            addChannel ( 0 );
+        }
+
+        if ( elapsedTime > 500 && elapsedTime < 1000 ) {
+            removeChannel ( 0 );
+            addChannel ( 1 );
+        }
+
+        if ( elapsedTime > 1000 && elapsedTime < 1500 ) {
+            removeChannel ( 1 );
+            addChannel ( 3 );
+        }
+
+        if ( elapsedTime > 1500 && elapsedTime < 2000 ) {
+            removeChannel ( 3 );
+            addChannel ( 2 );
+        }
+        
+        if ( elapsedTime > 2000 && elapsedTime < 2500 ) {
+            removeChannel( 2 );
+            addChannel ( 4 );
+        }
+        
+        if ( elapsedTime > 2500 && elapsedTime < 3000 ) {
+            removeChannel ( 4 );
+            addChannel ( 5 );
+        }
+        
+        if ( elapsedTime > 3000 && elapsedTime < 3500 ) {
+            removeChannel ( 5 );
+            addChannel ( 7 );
+        }
+        
+        if ( elapsedTime > 3500 && elapsedTime < 4000 ) {
+            removeChannel ( 7 );
+            addChannel ( 6 );
+        }
+        
+        if ( elapsedTime > 4000 ) {
+            removeChannel ( 6 );
         }
         
         for ( AsioChannel channelInfo : activeChannels ) {
