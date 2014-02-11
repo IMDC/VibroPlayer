@@ -114,6 +114,98 @@ public class AsioChannel {
     }
   }
   
+  public void writeDouble(double[] output) {
+    if (isInput) {
+      throw new IllegalStateException("Only output channels can be written to.");
+    }
+    if (!isActive) {
+      throw new IllegalStateException("This channel is not active: " + toString());
+    }
+    ByteBuffer outputBuffer = getByteBuffer();
+    switch (sampleType) {
+      case ASIOSTFloat64MSB:
+      case ASIOSTFloat64LSB: {
+        for (double sampleValue : output) {
+          outputBuffer.putDouble(sampleValue);          
+        }
+        break;
+      }
+      case ASIOSTFloat32MSB:
+      case ASIOSTFloat32LSB: {
+        for (double sampleValue : output) {
+          outputBuffer.putFloat( (float) sampleValue);          
+        }
+        break;
+      }
+      case ASIOSTInt32MSB:
+      case ASIOSTInt32LSB: {
+        for (double sampleValue : output) {
+          outputBuffer.putInt((int) (sampleValue * MAX_INT32));          
+        }
+        break;
+      }
+      case ASIOSTInt32MSB16:
+      case ASIOSTInt32LSB16: {
+        for (double sampleValue : output) {
+          outputBuffer.putInt((int) (sampleValue * MAX_INT16));          
+        }
+        break;
+      }
+      case ASIOSTInt32MSB18:
+      case ASIOSTInt32LSB18: {
+        for (double sampleValue : output) {
+          outputBuffer.putInt((int) (sampleValue * MAX_INT18));          
+        }
+        break;
+      }
+      case ASIOSTInt32MSB20:
+      case ASIOSTInt32LSB20: {
+        for (double sampleValue : output) {
+          outputBuffer.putInt((int) (sampleValue * MAX_INT20));          
+        }
+        break;
+      }
+      case ASIOSTInt32MSB24:
+      case ASIOSTInt32LSB24: {
+        for (double sampleValue : output) {
+          outputBuffer.putInt((int) (sampleValue * MAX_INT24));          
+        }
+        break;
+      }
+      case ASIOSTInt16MSB:
+      case ASIOSTInt16LSB: {
+        for (double sampleValue : output) {
+          outputBuffer.putShort((short) (sampleValue * MAX_INT16));          
+        }
+        break;
+      }
+      case ASIOSTInt24MSB: {
+        for (double sampleValue : output) {
+          int sampleValueInt = (int) (sampleValue * MAX_INT24);
+          outputBuffer.put((byte) ((sampleValueInt >> 16) & 0xFF));
+          outputBuffer.put((byte) ((sampleValueInt >> 8) & 0xFF));
+          outputBuffer.put((byte) (sampleValueInt & 0xFF));          
+        }
+        break;
+      }
+      case ASIOSTInt24LSB: {
+        for (double sampleValue : output) {
+          int sampleValueInt = (int) (sampleValue * MAX_INT24);
+          outputBuffer.put((byte) (sampleValueInt & 0xFF));
+          outputBuffer.put((byte) ((sampleValueInt >> 8) & 0xFF));
+          outputBuffer.put((byte) ((sampleValueInt >> 16) & 0xFF));
+        }
+        break;
+      }
+      case ASIOSTDSDInt8MSB1:
+      case ASIOSTDSDInt8LSB1:
+      case ASIOSTDSDInt8NER8: {
+        throw new IllegalStateException(
+            "The sample types ASIOSTDSDInt8MSB1, ASIOSTDSDInt8LSB1, and ASIOSTDSDInt8NER8 are not supported.");
+      }
+    }
+  }
+  
   /**
    * A convenience method to write a <code>float</code> array of samples to the output. The array 
    * values are expected to be bounded to the range of [-1,1]. The need to convert to the correct 

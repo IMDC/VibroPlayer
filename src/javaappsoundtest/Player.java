@@ -14,7 +14,7 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.math.BigDecimal;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.UnsupportedAudioFileException;
@@ -39,7 +39,7 @@ public class Player extends javax.swing.JFrame {
     /**
      * Creates new form NewJFrame
      */
-    public Player() {
+    public Player() throws WavFileException {
         initComponents();
         
         driver = null;
@@ -246,9 +246,9 @@ public class Player extends javax.swing.JFrame {
             }
         });
         
-        WAVFileReader sampleReader = null;
-        
-        /*try {
+            /*WAVFileReader sampleReader = null;
+            
+            try {
             
             sampleReader = new WAVFileReader ( new File ( "original_test.wav" ) );
             long nbSamples = sampleReader.getSampleCount();
@@ -260,11 +260,32 @@ public class Player extends javax.swing.JFrame {
             
             sampleReader.getInterleavedSamples ( 0, nbSamples, output );
             
-        } catch (UnsupportedAudioFileException e) {
+            } catch (UnsupportedAudioFileException e) {
             System.out.println ( e );
-        } catch (IOException e) {
+            } catch (IOException e) {
             System.out.println ( e );
-        }*/
+            }*/
+        try {
+            
+            double test = 0.000030;
+            
+            WavFile wavFile = WavFile.openWavFile ( new File ( "original_test.wav" ) );
+            
+            wavFile.display();
+            
+            int numChannels = wavFile.getNumChannels();
+            
+            output = new double[(int) wavFile.getNumFrames()];
+            wavFile.readFrames ( output, output.length );
+            
+            /*for ( int i = 0; i < output.length; i++ ) {
+                System.out.println ( output[i] );
+            }*/
+            
+            wavFile.close();
+        } catch (IOException ex) {
+            System.out.println ( ex );
+        }
     }
     
     private String start ( int channel ) {
@@ -693,7 +714,11 @@ public class Player extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Player().setVisible(true);
+                try {
+                    new Player().setVisible(true);
+                } catch (WavFileException ex) {
+                    System.out.println ( ex );
+                }
             }
         });
     }

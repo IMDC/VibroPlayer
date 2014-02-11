@@ -7,6 +7,7 @@
 package javaappsoundtest;
 
 import java.io.*;
+import java.math.BigDecimal;
 import javax.sound.sampled.*;
 
 /**
@@ -94,8 +95,14 @@ public class WAVFileReader {
                 if ( j < sampleSizeInBytes - 1 ) ival <<= 8;
             }
             // decode value
-            double ratio = Math.pow ( 2., format.getSampleSizeInBits() - 1 );
-            double val = ( (double) ival ) / ratio;
+            float ratio = (float) Math.pow ( 2., format.getSampleSizeInBits() - 1 );
+            float val = ( (float) ival ) / ratio;
+            if ( i > 14 ) {
+                //double test = ( (double) ival ) / ratio;
+                BigDecimal test = new BigDecimal ( ( (double) ival ) / ratio );
+                double test2 = test.doubleValue();
+                //System.out.println ( Double.valueOf ( test2 ) );
+            }
             audioSamples[i] = val;
         }
     }

@@ -31,7 +31,7 @@ public class ControlPanel extends javax.swing.JFrame implements com.synthbot.jas
      */
     public ControlPanel() {
         initComponents();
-        
+               
         comboBox.removeAllItems();
         
         List<String> list = AsioDriver.getDriverNames();

@@ -23,7 +23,7 @@ public class AsioSoundHost implements AsioDriverListener {
     private int bufferSize;
     private double sampleRate;
     private Set<AsioChannel> activeChannels;
-    private float[] output;
+    private double[] output;
     
     private boolean[] channel;
     private long startTime;  
@@ -39,7 +39,7 @@ public class AsioSoundHost implements AsioDriverListener {
             bufferSize = this.driver.getBufferPreferredSize();
             sampleRate = this.driver.getSampleRate();
           
-            output = new float[bufferSize];
+            output = new double[bufferSize];
             activeChannels = new HashSet<AsioChannel>();
             
             activeChannels.add (this.driver.getChannelOutput(0));
@@ -80,8 +80,11 @@ public class AsioSoundHost implements AsioDriverListener {
             try {
                //output[i] = (float) Math.sin ( 2 * Math.PI * sampleIndex * 200.0 / sampleRate );
                
-                output[i] = (float) Math.sin ( noteFrequency * 2 * Math.PI * i / sampleRate );
-                //System.out.println ( sampleRate );
+                float result = (float) Math.sin ( noteFrequency * 2 * Math.PI * i / sampleRate );
+                output[i] = result;
+                
+                System.out.println ( Player.output[i] );
+                output[i] = (float) Player.output[i];
             }
             catch ( Exception e ) {
                 System.out.println ( "EXCEPTION: " + e );
@@ -89,54 +92,20 @@ public class AsioSoundHost implements AsioDriverListener {
         }
         
         long elapsedTime = ( ( sampleTime - startTime ) / 1000000);
-           
-        if ( elapsedTime > 0 && elapsedTime < 500 ) {
-            addChannel ( 0 );
-        }
-
-        if ( elapsedTime > 500 && elapsedTime < 1000 ) {
-            removeChannel ( 0 );
-            addChannel ( 1 );
-        }
-
-        if ( elapsedTime > 1000 && elapsedTime < 1500 ) {
-            removeChannel ( 1 );
-            addChannel ( 3 );
-        }
-
-        if ( elapsedTime > 1500 && elapsedTime < 2000 ) {
-            removeChannel ( 3 );
-            addChannel ( 2 );
-        }
         
-        if ( elapsedTime > 2000 && elapsedTime < 2500 ) {
-            removeChannel( 2 );
-            addChannel ( 4 );
-        }
-        
-        if ( elapsedTime > 2500 && elapsedTime < 3000 ) {
-            removeChannel ( 4 );
-            addChannel ( 5 );
-        }
-        
-        if ( elapsedTime > 3000 && elapsedTime < 3500 ) {
-            removeChannel ( 5 );
-            addChannel ( 7 );
-        }
-        
-        if ( elapsedTime > 3500 && elapsedTime < 4000 ) {
-            removeChannel ( 7 );
-            addChannel ( 6 );
-        }
-        
-        if ( elapsedTime > 4000 ) {
-            removeChannel ( 6 );
-        }
+        addChannel ( 0 );
+        addChannel ( 1 );
+        addChannel ( 2 );
+        addChannel ( 3 );
+        addChannel ( 4 );
+        addChannel ( 5 );
+        addChannel ( 6 );
+        addChannel ( 7 );
         
         for ( AsioChannel channelInfo : activeChannels ) {
             
             if ( channel[channelInfo.getChannelIndex()] ) {
-                channelInfo.write ( output );
+                channelInfo.writeDouble ( output );
             }
             
         }
