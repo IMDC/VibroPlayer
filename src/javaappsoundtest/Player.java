@@ -14,10 +14,6 @@ import java.io.FileFilter;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 
 /**
@@ -246,41 +242,13 @@ public class Player extends javax.swing.JFrame {
             }
         });
         
-            /*WAVFileReader sampleReader = null;
-            
-            try {
-            
-            sampleReader = new WAVFileReader ( new File ( "original_test.wav" ) );
-            long nbSamples = sampleReader.getSampleCount();
-            System.out.println ( "nbChannel = " + sampleReader.getFormat().getChannels() );
-            System.out.println ( "frameRate = " + sampleReader.getFormat().getFrameRate() );
-            System.out.println ( "sampleSize = " + sampleReader.getFormat().getSampleSizeInBits() );
-            
-            output = new double[(int) nbSamples];
-            
-            sampleReader.getInterleavedSamples ( 0, nbSamples, output );
-            
-            } catch (UnsupportedAudioFileException e) {
-            System.out.println ( e );
-            } catch (IOException e) {
-            System.out.println ( e );
-            }*/
         try {
-            
-            double test = 0.000030;
-            
             WavFile wavFile = WavFile.openWavFile ( new File ( "original_test.wav" ) );
             
             wavFile.display();
             
-            int numChannels = wavFile.getNumChannels();
-            
             output = new double[(int) wavFile.getNumFrames()];
             wavFile.readFrames ( output, output.length );
-            
-            /*for ( int i = 0; i < output.length; i++ ) {
-                System.out.println ( output[i] );
-            }*/
             
             wavFile.close();
         } catch (IOException ex) {

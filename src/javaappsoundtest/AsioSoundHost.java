@@ -19,10 +19,10 @@ import java.util.Set;
 public class AsioSoundHost implements AsioDriverListener {
     
     AsioDriver driver;
-    private int sampleIndex;
     private int bufferSize;
     private double sampleRate;
     private Set<AsioChannel> activeChannels;
+    
     private double[] output;
     
     private boolean[] channel;
@@ -32,7 +32,6 @@ public class AsioSoundHost implements AsioDriverListener {
     
     AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
-            sampleIndex = 1;
             this.driver = driver;
             this.driver.addAsioDriverListener ( this );
             
@@ -40,7 +39,7 @@ public class AsioSoundHost implements AsioDriverListener {
             sampleRate = this.driver.getSampleRate();
           
             output = new double[bufferSize];
-            activeChannels = new HashSet<AsioChannel>();
+            activeChannels = new HashSet<>();
             
             activeChannels.add (this.driver.getChannelOutput(0));
             activeChannels.add (this.driver.getChannelOutput(1));
@@ -50,15 +49,14 @@ public class AsioSoundHost implements AsioDriverListener {
             activeChannels.add (this.driver.getChannelOutput(5));
             activeChannels.add (this.driver.getChannelOutput(6));
             activeChannels.add (this.driver.getChannelOutput(7));
-            
+                        
             channel = new boolean[8];
             for ( int i = 0; i < channel.length; i++ ) {
-                channel[i] = false;
+                channel[i] = true;
             }
             
             this.driver.createBuffers(activeChannels);
             
-            startTime = System.nanoTime(); 
             noteFrequency = 200;
         }
         /* play output to given channel
@@ -73,10 +71,8 @@ public class AsioSoundHost implements AsioDriverListener {
         this.channel[channel] = true;
     }
 
-    @Override
-    public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
-        
-        for ( int i = 0; i < bufferSize; i++, sampleIndex++ ) {
+    private void createSound() {
+        for ( int i = 0; i < bufferSize; i++ ) {
             try {
                //output[i] = (float) Math.sin ( 2 * Math.PI * sampleIndex * 200.0 / sampleRate );
                
@@ -90,17 +86,12 @@ public class AsioSoundHost implements AsioDriverListener {
                 System.out.println ( "EXCEPTION: " + e );
             }
         }
+    }
+    
+    @Override
+    public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
         
         long elapsedTime = ( ( sampleTime - startTime ) / 1000000);
-        
-        addChannel ( 0 );
-        addChannel ( 1 );
-        addChannel ( 2 );
-        addChannel ( 3 );
-        addChannel ( 4 );
-        addChannel ( 5 );
-        addChannel ( 6 );
-        addChannel ( 7 );
         
         for ( AsioChannel channelInfo : activeChannels ) {
             
