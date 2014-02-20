@@ -114,7 +114,7 @@ public class AsioChannel {
     }
   }
   
-  public void writeDouble(double[] output) {
+  public void write ( byte[] output) {
     if (isInput) {
       throw new IllegalStateException("Only output channels can be written to.");
     }

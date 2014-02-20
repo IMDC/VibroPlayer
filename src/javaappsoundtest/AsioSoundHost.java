@@ -52,15 +52,15 @@ public class AsioSoundHost implements AsioDriverListener {
                         
             channel = new boolean[8];
             for ( int i = 0; i < channel.length; i++ ) {
-                channel[i] = true;
+                channel[i] = false;
             }
             
             this.driver.createBuffers(activeChannels);
             
             noteFrequency = 200;
+            
+            createSound();
         }
-        /* play output to given channel
-         */
     }
     
     public void removeChannel ( int channel ) {
@@ -79,13 +79,74 @@ public class AsioSoundHost implements AsioDriverListener {
                 float result = (float) Math.sin ( noteFrequency * 2 * Math.PI * i / sampleRate );
                 output[i] = result;
                 
-                System.out.println ( Player.output[i] );
+                
                 output[i] = (float) Player.output[i];
+                System.out.println ( output[i] );
             }
             catch ( Exception e ) {
                 System.out.println ( "EXCEPTION: " + e );
             }
         }
+        
+        /*output[0] = 0;
+        output[1] = 0;
+        output[2] = 0;
+        output[3] = 0;
+        output[4] = 0;
+        output[5] = 0;
+        output[6] = 0;
+        output[7] = 0;
+        output[8] = 0;
+        output[9] = 0;
+        output[10] = 0;
+        output[11] = 0;
+        output[12] = 0;
+        output[13] = 0;
+        output[14] = 0;
+        output[15] = 0.030517578125;
+        output[16] = 0.06103515625;
+        output[17] = 0.06103515625;
+        output[18] = -0.030517578125;
+        output[19] = -0.030517578125;
+        output[20] = 0.6103515625;
+        output[21] = -0.06103515625;
+        output[22] = 0.030517578125;
+        output[23] = 0.030517578125;
+        output[24] = -0.091552734375;
+        output[25] = 0.091552734375;
+        output[26] = -0.091552734375;
+        output[27] = 0.091552734375;
+        output[28] = -0.06103515625;
+        output[29] = 0.030517578125;
+        output[30] = -0.030517578125;
+        output[31] = 0;
+        output[32] = 0;
+        output[33] = -0.030517578125;
+        output[34] = 0.06103515625;
+        output[35] = -0.091552734375;
+        output[36] = 0.091552734375;
+        output[37] = -0.06103515625;
+        output[38] = 0.06103515625;
+        output[39] = -0.06103515625;
+        output[40] = 0.06103515625;
+        output[41] = -0.06103515625;
+        output[42] = 0.030517578125;
+        output[43] = 0;
+        output[44] = 0.030517578125;
+        output[45] = -0.06103515625;
+        output[46] = 0.091552734375;
+        output[47] = -0.091552734375;
+        output[48] = 0.030517578125;
+        output[49] = 0.06103515625;
+        output[50] = -0.01220703125;
+        output[51] = 0.01220703125;
+        output[52] = -0.091552734375;
+        output[53] = 0.06103515625;
+        output[54] = 0;
+        output[55] = -0.06103515625;
+        output[56] = -0.06103515625;
+        output[57] = 0.06103515625;*/
+
     }
     
     @Override
@@ -96,7 +157,7 @@ public class AsioSoundHost implements AsioDriverListener {
         for ( AsioChannel channelInfo : activeChannels ) {
             
             if ( channel[channelInfo.getChannelIndex()] ) {
-                channelInfo.writeDouble ( output );
+                channelInfo.write ( Player.output );
             }
             
         }

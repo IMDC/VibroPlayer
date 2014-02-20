@@ -8,12 +8,19 @@ package javaappsoundtest;
 
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverState;
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
 import javax.swing.JFileChooser;
 
 /**
@@ -26,7 +33,7 @@ public class Player extends javax.swing.JFrame {
     
     public static AsioDriver driver;
     
-    public static double[] output;
+    public static byte[] output;
     
     AsioSoundHost listener;
     
@@ -35,7 +42,7 @@ public class Player extends javax.swing.JFrame {
     /**
      * Creates new form NewJFrame
      */
-    public Player() throws WavFileException {
+    public Player(){
         initComponents();
         
         driver = null;
@@ -82,108 +89,94 @@ public class Player extends javax.swing.JFrame {
         labelChannel1.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel1 = getFile ( evt, 1 );
-                System.out.println ( channel1 );
             }
         });
         
         fileChannel2.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel2 = getFile ( evt, 2 );
-                System.out.println ( channel2 );
             }
         });
         
         labelChannel2.addMouseListener ( new java.awt.event.MouseAdapter() {
            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                channel2 = getFile ( evt, 2 );
-               System.out.println ( channel2 );
            }
         });
         
         fileChannel3.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel3 = getFile ( evt, 3 );
-                System.out.println ( channel3 );
             }
         });
         
         labelChannel3.addMouseListener ( new java.awt.event.MouseAdapter() {
            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                channel3 = getFile ( evt, 3 );
-               System.out.println ( channel3 );
            }
         });
         
         fileChannel4.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel4 = getFile ( evt, 4 );
-                System.out.println ( channel4 );
             }
         });
         
         labelChannel4.addMouseListener ( new java.awt.event.MouseAdapter() {
            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                channel4 = getFile ( evt, 4 );
-               System.out.println ( channel4 );
            }
         });
         
         fileChannel5.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel5 = getFile ( evt, 5 );
-                System.out.println ( channel5 );
             }
         });
         
         labelChannel5.addMouseListener ( new java.awt.event.MouseAdapter() {
            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                channel5 = getFile ( evt, 5 );
-               System.out.println ( channel5 );
            }
         });
         
         fileChannel6.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel6 = getFile ( evt, 6 );
-                System.out.println ( channel6 );
             }
         });
         
         labelChannel6.addMouseListener ( new java.awt.event.MouseAdapter() {
            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                channel6 = getFile ( evt, 6 );
-               System.out.println ( channel6 );
            }
         });
         
         fileChannel7.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel7 = getFile ( evt, 7 );
-                System.out.println ( channel7 );
             }
         });
         
         labelChannel7.addMouseListener ( new java.awt.event.MouseAdapter() {
            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                channel7 = getFile ( evt, 7 );
-               System.out.println ( channel7 );
            }
         });
         
         fileChannel8.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 channel8 = getFile ( evt, 8 );
-                System.out.println ( channel8 );
             }
         });
         
         labelChannel8.addMouseListener ( new java.awt.event.MouseAdapter() {
            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                channel8 = getFile ( evt, 8 );
-               System.out.println ( channel8 );
            }
         });
         
+        /* Listener to control panel button. Control panel form opens */
         controlPanelBtn.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 ControlPanel controlPanel = new ControlPanel();
@@ -194,9 +187,6 @@ public class Player extends javax.swing.JFrame {
         playChannel1.addMouseListener ( new java.awt.event.MouseAdapter() {
             public void mouseClicked ( java.awt.event.MouseEvent evt ) {
                 playChannel1.setText( start ( 0 ) );
-                
-                
-                
             }
         });
         
@@ -242,15 +232,93 @@ public class Player extends javax.swing.JFrame {
             }
         });
         
+        
         try {
+            File inputFile = new File ( "original_test.wav" );
+            
+            AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat ( inputFile );
+            AudioFormat audioFormat = fileFormat.getFormat();
+            
+            int nBufferSize = 1024 * audioFormat.getFrameSize();
+            byte[] abBuffer = new byte[nBufferSize];
+            
+            AudioInputStream inputAIS = AudioSystem.getAudioInputStream ( inputFile );
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            
+            while (true) {
+                System.out.println ( "trying to read (bytes): " + abBuffer.length);
+                int nBytesRead = inputAIS.read ( abBuffer );
+                System.out.println ( "read (bytes): " + nBytesRead );
+                
+                if (nBytesRead == -1) {
+                    break;
+                }
+                
+                baos.write(abBuffer, 0, nBytesRead);
+            }
+            
+            output = baos.toByteArray();
+            System.out.println ( "asdas" );
+
+            /*for ( int i = 0; i < output.length; i++ ) {
+                //output[i] = (byte) doubleOutput[i];
+                System.out.println ( output[i] );
+                /*String test = Double.toString( doubleOutput[i] );
+                System.out.println ( Double.doubleToLongBits ( doubleOutput[i] ) );
+            }*/
+            
+            /*System.out.println("\n\nDISPLAY BYTE ARRAY INFORMATION FOR INPUT FILE:");
+            wavInputData.printByteInfo();
+
+            System.out.println("PLAY BYTE ARRAY (THIS WILL BE RECORDED)");
+            WavAudioPlayer player = new WavFileHelper.WavAudioPlayer(wavInputData);
+            player.playAudio();*/
+
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        
+        
+        /* Test to load a WAV File */
+        /*try {
             WavFile wavFile = WavFile.openWavFile ( new File ( "original_test.wav" ) );
             
             wavFile.display();
             
-            output = new double[(int) wavFile.getNumFrames()];
-            wavFile.readFrames ( output, output.length );
+            double[] doubleOutput;
+            
+            doubleOutput = new double[(int) wavFile.getNumFrames()];
+            
+            wavFile.readFrames ( doubleOutput, doubleOutput.length );
+            
+            for ( int i = 0; i < doubleOutput.length; i++ ) {
+                //output[i] = (byte) doubleOutput[i];
+                //System.out.println ( output[i] );
+                String test = Double.toString( doubleOutput[i] );
+                System.out.println ( Double.doubleToLongBits ( doubleOutput[i] ) );
+            }
             
             wavFile.close();
+        } catch (IOException ex) {
+            System.out.println ( ex );
+        }*/
+        
+        try {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            BufferedInputStream in;
+            
+            in = new BufferedInputStream ( new FileInputStream ( "original_test.wav" ) );
+            
+            int read;
+            byte[] buff = new byte[1024];
+            while ((read = in.read(buff)) > 0)
+            {
+                out.write(buff, 0, read);
+            }
+            out.flush();
+            output = out.toByteArray();
+        } catch (FileNotFoundException ex) {
+            System.out.println ( ex );
         } catch (IOException ex) {
             System.out.println ( ex );
         }
@@ -682,11 +750,7 @@ public class Player extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                try {
-                    new Player().setVisible(true);
-                } catch (WavFileException ex) {
-                    System.out.println ( ex );
-                }
+                new Player().setVisible(true);
             }
         });
     }
