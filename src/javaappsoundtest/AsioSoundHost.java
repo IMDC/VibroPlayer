@@ -9,8 +9,17 @@ package javaappsoundtest;
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
+import java.io.ByteArrayOutputStream;
+import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.Set;
+import static javaappsoundtest.Player.channel1;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 /**
  *
@@ -23,12 +32,18 @@ public class AsioSoundHost implements AsioDriverListener {
     private double sampleRate;
     private Set<AsioChannel> activeChannels;
     
-    private double[] output;
+    private float[] output;
     
     private boolean[] channel;
     private long startTime;  
     
     private double noteFrequency;
+    
+    byte[] abBuffer;
+    FileInputStream inputStream;
+    
+    int frameSize;
+    
     
     AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
@@ -38,7 +53,7 @@ public class AsioSoundHost implements AsioDriverListener {
             bufferSize = this.driver.getBufferPreferredSize();
             sampleRate = this.driver.getSampleRate();
           
-            output = new double[bufferSize];
+            output = new float[bufferSize];
             activeChannels = new HashSet<>();
             
             activeChannels.add (this.driver.getChannelOutput(0));
@@ -57,7 +72,26 @@ public class AsioSoundHost implements AsioDriverListener {
             
             this.driver.createBuffers(activeChannels);
             
-            noteFrequency = 200;
+            noteFrequency = 800;
+            
+            try {
+                AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(channel1);
+                AudioFormat audioFormat = fileFormat.getFormat();
+
+                frameSize = audioFormat.getFrameSize();
+
+                int nBufferSize = driver.getBufferPreferredSize();//1024 * audioFormat.getFrameSize();
+                abBuffer = new byte[nBufferSize];
+
+                AudioInputStream inputAIS = AudioSystem.getAudioInputStream(channel1);
+
+                ByteArrayOutputStream baos = new ByteArrayOutputStream();
+
+                inputStream = new FileInputStream("c:\\Users\\imdc\\desktop\\2.wav");
+
+            } catch (Exception ex) {
+
+            }
             
             createSound();
         }
@@ -72,21 +106,24 @@ public class AsioSoundHost implements AsioDriverListener {
     }
 
     private void createSound() {
-        for ( int i = 0; i < bufferSize; i++ ) {
+        for ( int i = 0; i < bufferSize; i++ ) 
+        {
             try {
                //output[i] = (float) Math.sin ( 2 * Math.PI * sampleIndex * 200.0 / sampleRate );
                
                 float result = (float) Math.sin ( noteFrequency * 2 * Math.PI * i / sampleRate );
-                output[i] = result;
+                //output[i] = result * 10000;
                 
                 
-                output[i] = (float) Player.output[i];
+                //output[i] = (float) Player.output[i];
                 System.out.println ( output[i] );
             }
             catch ( Exception e ) {
                 System.out.println ( "EXCEPTION: " + e );
             }
         }
+        
+        System.out.println ( "asdasd" );
         
         /*output[0] = 0;
         output[1] = 0;
@@ -151,15 +188,52 @@ public class AsioSoundHost implements AsioDriverListener {
     
     @Override
     public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
-        
-        long elapsedTime = ( ( sampleTime - startTime ) / 1000000);
-        
-        for ( AsioChannel channelInfo : activeChannels ) {
-            
-            if ( channel[channelInfo.getChannelIndex()] ) {
-                channelInfo.write ( Player.output );
+
+        long elapsedTime = ((sampleTime - startTime) / 1000000);
+
+        for (AsioChannel channelInfo : activeChannels) {
+
+            if (channel[channelInfo.getChannelIndex()]) {
+
+                try 
+                {
+                    //inputStream.skip(44);
+                } 
+                catch (Exception ex) {
+
+                }
+                byte[] sample = new byte[frameSize]; 
+                try {
+                    for(int i = 0; i < output.length; i++)
+                    {
+                        for (int j = 0; j < sample.length; j++) 
+                        {
+                            sample[j] = (byte) inputStream.read();
+                        }
+                       // ByteBuffer buffer = ByteBuffer.wrap(sample);
+                        
+                        //try{
+                        float samplef = ByteBuffer.wrap(sample).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                        output[i] = samplef;
+                      //  }
+                      //  catch(Exception ex)
+                      //  {
+                      //      System.out.println(ex.getMessage());
+                      //  }
+                        
+                    }
+                    
+
+                } catch (Exception ex) {
+                    System.out.println(ex.getMessage());
+                    break;
+
+                }
+                //output = abBuffer;
+                channelInfo.write(output);
+                // System.out.println(sampleTime + " " + samplePosition);//channelInfo.write ( output );
             }
-            
+
         }
     }
     
