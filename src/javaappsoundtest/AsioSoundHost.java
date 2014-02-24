@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package javaappsoundtest;
 
 import com.synthbot.jasiohost.AsioChannel;
@@ -16,12 +10,27 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * This is the AsioSoundHost class. It implements AsioDriverListener. That is the
+ * class responsible to play a sound to a specific channel and control the driver
+ * at all.
  * 
- *
  * @author Rener Baffa da Silva
  */
 public class AsioSoundHost implements AsioDriverListener {
     
+    /**
+     * @param driver            Current driver.
+     * @param buferSize         Buffer size.
+     * @param sampleRate        Sample Rate.
+     * @param activeChannels    List of channels.
+     * @param output            Sound signal to be played.
+     * @param channel           List of active channels.
+     * @param startTime         Time that the driver was started.
+     * 
+     * @param aBuffer           Bytes read.
+     * @param inputStream       File source from where the information is got.
+     * @param frameSize         Frame size.
+     */
     AsioDriver driver;
     private int bufferSize;
     private double sampleRate;
@@ -32,10 +41,11 @@ public class AsioSoundHost implements AsioDriverListener {
     private boolean[] channel;
     private long startTime;
     
-    byte[] abBuffer;
-    FileInputStream inputStream;
-    
-    int frameSize;
+    /* Can we throw it out when move the file load? */
+        byte[] abBuffer;
+        FileInputStream inputStream;
+
+        int frameSize;
     
     /**
      * Class constructor. This is the constructor of the class that initializes
@@ -114,7 +124,7 @@ public class AsioSoundHost implements AsioDriverListener {
     @Override
     public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
 
-        /* Get the elapsed time (difference between the current time and the start time. */
+        /* Get the elapsed time (difference between the current time and the start time and convert it to seconds. */
             long elapsedTime = ((sampleTime - startTime) / 1000000);
 
         /* Runs all the channel in the active list */
