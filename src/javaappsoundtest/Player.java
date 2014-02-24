@@ -7,218 +7,210 @@ package javaappsoundtest;
 
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverState;
-import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileFilter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import javax.swing.JFileChooser;
-import java.io.*;
 
 /**
+ * Player class. This the main class of the project.
  *
- * @author imdc
+ * @author Rener Baffa da Silva
  */
 public class Player extends javax.swing.JFrame {
 
-    static File channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8;
+    /**
+     * @param channel1          File of the first channel.
+     * @param channel2          File of the second channel.
+     * @param channel3          File of the third channel.
+     * @param channel4          File of the fourth channel.
+     * @param channel5          File of the fifth channel.
+     * @param channel6          File of the sixth channel.
+     * @param channel7          File of the seventh channel.
+     * @param channel8          File of the eighth channel.
+     * @param driver            Current sound driver.
+     * @param listener          Driver listener.
+     * @param output            Sound information to be played.
+     * @param playingChannel    List of channels that are playing the sound.
+     */
+    private File channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8;
 
-    public static AsioDriver driver;
+    private AsioDriver driver;
+    private AsioSoundHost listener;
 
+    /* Change that to an array?! */
     public static byte[] output;
-
-    AsioSoundHost listener;
 
     private boolean[] playingChannel;
 
     /**
-     * Creates new form NewJFrame
+     * Class constructor. Load the previously information and initializes everything needed such as the driver.
      */
     public Player() {
-        initComponents();
+        /* Method created automaticaly by NetBeans to position all elements in the screen */
+            initComponents();
 
-        driver = null;
+        /* Initializes the sound driver */
+            driver = null;
 
-        playingChannel = new boolean[8];
-
-        for (int i = 0; i < playingChannel.length; i++) {
-            playingChannel[i] = false;
-        }
-
-        /* to load config */
-        BufferedReader reader;
-        try {
-            if (new File("config.txt").exists()) {
-                reader = new BufferedReader(new FileReader("config.txt"));
-
-                String line = null;
-
-                while ((line = reader.readLine()) != null) {
-                    String split[] = line.split(";");
-
-                    if (split[0].equals("Audio Driver")) {
-                        driver = AsioDriver.getDriver(split[1]);
-                    }
-                }
-
-                reader.close();
+        /* Creates and initializes the list with channels that are playing with none */
+            playingChannel = new boolean[8];
+            for (int i = 0; i < playingChannel.length; i++) {
+                playingChannel[i] = false;
             }
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
 
-        fileChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                System.out.println(driver);
-                channel1 = getFile(evt, 1);
-                System.out.println(channel1);
-                start(1);
+        /**
+         * Load the driver previously used if the file config.txt exists.
+         */
+            BufferedReader reader;
+            try {
+                /* Check if the file exists */
+                if (new File("config.txt").exists()) {
+                    reader = new BufferedReader(new FileReader("config.txt"));
 
-               /* try {
+                    /* Read every line of the file */
+                    String line = null;
+                    while ( ( line = reader.readLine()) != null) {
+                        String split[] = line.split ( ";" );
 
-                    AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(channel1);
-                    AudioFormat audioFormat = fileFormat.getFormat();
-
-                    int frameSize = audioFormat.getFrameSize();
-
-                    int nBufferSize = driver.getBufferPreferredSize();//1024 * audioFormat.getFrameSize();
-                    byte[] abBuffer = new byte[nBufferSize];
-
-                    AudioInputStream inputAIS = AudioSystem.getAudioInputStream(channel1);
-
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-                    FileInputStream inputStream = new FileInputStream("c:\\Users\\imdc\\desktop\\2.wav");
-
-                    while (true) {
-                        try {
-                            while (true) {
-                               // 
-                                //int nBytesRead = inputAIS.read ( abBuffer );
-                                //System.out.println(inputStream.read());
-
-                                //long bytesSkipped = inputAIS.skip(4);
-                                try {
-                                    for (int i = 0; i < abBuffer.length; i++) {
-                                        abBuffer[i] = (byte) inputStream.read();
-                                    }
-
-                                } catch (Exception ex) {
-                                    break;
-
-                                }
-                                // System.out.println(abBuffer[0]);
-                                output = abBuffer;//baos.toByteArray();
-
-                            }
-
-                        } catch (Exception ex) {
-                            break;
+                        if ( split[0].equals ( "Audio Driver" ) ) {
+                            driver = AsioDriver.getDriver(split[1]);
                         }
-
                     }
 
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                }*/
+                    reader.close();
+                }
+            } catch (FileNotFoundException ex) {
+                System.out.println(ex);
+            } catch (IOException ex) {
+                System.out.println(ex);
             }
-        });
 
-        labelChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
+        /* Listener to load the file chosen to the channel 1 variable. It maps the event of click on the Text Field. */
+        fileChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel1 = getFile(evt, 1);
             }
         });
 
+        /* Listener to load the file chosen to the channel 1 variable. It maps the event of click on the Label. */
+        labelChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                channel1 = getFile(evt, 1);
+            }
+        });
+
+        /* Listener to load the file chosen to the channel 2 variable. It maps the event of click on the Text Field. */
         fileChannel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel2 = getFile(evt, 2);
             }
         });
 
+        /* Listener to load the file chosen to the channel 2 variable. It maps the event of click on the Label. */
         labelChannel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel2 = getFile(evt, 2);
             }
         });
 
+        /* Listener to load the file chosen to the channel 3 variable. It maps the event of click on the Text Field. */
         fileChannel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel3 = getFile(evt, 3);
             }
         });
 
+        /* Listener to load the file chosen to the channel 3 variable. It maps the event of click on the Label. */
         labelChannel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel3 = getFile(evt, 3);
             }
         });
 
+        /* Listener to load the file chosen to the channel 4 variable. It maps the event of click on the Text Field. */
         fileChannel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel4 = getFile(evt, 4);
             }
         });
 
+        /* Listener to load the file chosen to the channel 4 variable. It maps the event of click on the Label. */
         labelChannel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel4 = getFile(evt, 4);
             }
         });
 
+        /* Listener to load the file chosen to the channel 5 variable. It maps the event of click on the Text Field. */
         fileChannel5.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel5 = getFile(evt, 5);
             }
         });
 
+        /* Listener to load the file chosen to the channel 5 variable. It maps the event of click on the Label. */
         labelChannel5.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel5 = getFile(evt, 5);
             }
         });
 
+        /* Listener to load the file chosen to the channel 6 variable. It maps the event of click on the Text Field. */
         fileChannel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel6 = getFile(evt, 6);
             }
         });
 
+        /* Listener to load the file chosen to the channel 6 variable. It maps the event of click on the Label. */
         labelChannel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel6 = getFile(evt, 6);
             }
         });
 
+        /* Listener to load the file chosen to the channel 7 variable. It maps the event of click on the Text Field. */
         fileChannel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel7 = getFile(evt, 7);
             }
         });
 
+        /* Listener to load the file chosen to the channel 7 variable. It maps the event of click on the Label. */
         labelChannel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel7 = getFile(evt, 7);
             }
         });
 
+        /* Listener to load the file chosen to the channel 8 variable. It maps the event of click on the Text Field. */
         fileChannel8.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel8 = getFile(evt, 8);
             }
         });
 
+        /* Listener to load the file chosen to the channel 8 variable. It maps the event of click on the Label. */
         labelChannel8.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 channel8 = getFile(evt, 8);
             }
@@ -226,130 +218,114 @@ public class Player extends javax.swing.JFrame {
 
         /* Listener to control panel button. Control panel form opens */
         controlPanelBtn.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 ControlPanel controlPanel = new ControlPanel();
                 controlPanel.setVisible(true);
             }
         });
 
+        
+        /* Listener to start button to play the sound in the channel 1 */
         playChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel1.setText(start(0));
             }
         });
 
+        /* Listener to start button to play the sound in the channel 2 */
         playChannel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel2.setText(start(1));
             }
         });
 
+        /* Listener to start button to play the sound in the channel 3 */
         playChannel3.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel3.setText(start(2));
             }
         });
 
+        /* Listener to start button to play the sound in the channel 4 */
         playChannel4.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel4.setText(start(3));
             }
         });
 
+        /* Listener to start button to play the sound in the channel 5 */
         playChannel5.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel5.setText(start(4));
             }
         });
 
+        /* Listener to start button to play the sound in the channel 6 */
         playChannel6.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel6.setText(start(5));
             }
         });
 
+        /* Listener to start button to play the sound in the channel 7 */
         playChannel7.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel7.setText(start(6));
             }
         });
 
+        /* Listener to start button to play the sound in the channel 8 */
         playChannel8.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 playChannel8.setText(start(7));
             }
         });
-
-        /* Test to load a WAV File */
-        /*try {
-         WavFile wavFile = WavFile.openWavFile ( new File ( "original_test.wav" ) );
-            
-         wavFile.display();
-            
-         double[] doubleOutput;
-            
-         doubleOutput = new double[(int) wavFile.getNumFrames()];
-            
-         wavFile.readFrames ( doubleOutput, doubleOutput.length );
-            
-         for ( int i = 0; i < doubleOutput.length; i++ ) {
-         //output[i] = (byte) doubleOutput[i];
-         //System.out.println ( output[i] );
-         String test = Double.toString( doubleOutput[i] );
-         System.out.println ( Double.doubleToLongBits ( doubleOutput[i] ) );
-         }
-            
-         wavFile.close();
-         } catch (IOException ex) {
-         System.out.println ( ex );
-         }*/
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            BufferedInputStream in;
-
-            in = new BufferedInputStream(new FileInputStream("original_test.wav"));
-
-            int read;
-            byte[] buff = new byte[1024];
-            while ((read = in.read(buff)) > 0) {
-                out.write(buff, 0, read);
-            }
-            out.flush();
-            output = out.toByteArray();
-        } catch (FileNotFoundException ex) {
-            System.out.println(ex);
-        } catch (IOException ex) {
-            System.out.println(ex);
-        }
     }
 
+    /**
+     * Start method. It starts to play sound in a channel.
+     * 
+     * @param channel Channel where the sounds will be played.
+     * @return Return the string to be putted into the text of the button. It is used to
+     * change the text of the button (when you click and the channel is not playing so
+     * the text change to "stop" at the same time it is playing.
+     */
     private String start(int channel) {
 
-        if (driver.getCurrentState() != AsioDriverState.RUNNING) {
-            listener = new AsioSoundHost(driver);
-            driver.start();
-            System.out.println("Driver started.");
-        }
+        /* Check if the driver is already running. If not, starts it */
+            if ( driver.getCurrentState() != AsioDriverState.RUNNING ) {
+                listener = new AsioSoundHost(driver);
+                driver.start();
+            }
 
-        if (playingChannel[channel]) {
-            listener.removeChannel(channel);
-            playingChannel[channel] = false;
-
-            System.out.println(channel + " is off");
-            return "Play";
-        } else {
-            listener.addChannel(channel);
-            playingChannel[channel] = true;
-            System.out.println(channel + " is on");
-            return "Stop";
-        }
+        /* Check if the channel is already playing a sound */
+            if ( playingChannel[channel] ) {
+                /* If the channel is already playin change it to inactive */
+                listener.removeChannel(channel);
+                playingChannel[channel] = false;
+                return "Play";
+            } else {
+                /* If the channel isn't playing change it to active */
+                listener.addChannel(channel);
+                playingChannel[channel] = true;
+                return "Stop";
+            }
 
     }
 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+     * regenerated by the NetBeans Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -466,11 +442,6 @@ public class Player extends javax.swing.JFrame {
         controlPanelBtn.setText("Control panel");
 
         playChannel1.setText("Play");
-        playChannel1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                playChannel1ActionPerformed(evt);
-            }
-        });
 
         playChannel2.setText("Play");
 
@@ -667,8 +638,8 @@ public class Player extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    /* Listener to play song in all channels */
     private void playAllSoungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playAllSoungActionPerformed
-
         start(0);
         start(1);
         start(2);
@@ -677,39 +648,44 @@ public class Player extends javax.swing.JFrame {
         start(5);
         start(6);
         start(7);
-
     }//GEN-LAST:event_playAllSoungActionPerformed
 
-    private void playChannel1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playChannel1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_playChannel1ActionPerformed
-
+    /**
+     * Get file method. Load the file and record it in the correspondent variable.
+     * 
+     * @param idChannel Specifies from what channel that file is.
+     * @return Chosen file if it exists or null for the case that any file wasn't chosen.
+     */
     private File getFile(java.awt.event.MouseEvent evt, int idChannel) {
-        JFileChooser fc = new JFileChooser();
+        /* Creates the dialog and uses a filter to just show sound files
+         * (specified in the SoundsFilter class).
+         */
+            JFileChooser fc = new JFileChooser();
+            fc.setFileFilter(new SoundsFilter());
 
-        fc.setFileFilter(new SoundsFilter());
-
+        /* Check if the file was chosen. If yes so return the file. If not so return null. */
         int returnedValue = fc.showDialog(rootPane, null);
-
+        
         if (returnedValue == JFileChooser.APPROVE_OPTION) {
+            /* Create the file with chosen path and  */
             File chosenFile = fc.getSelectedFile();
 
             if (idChannel == 1) {
-                fileChannel1.setText(chosenFile.getPath());
+                fileChannel1.setText ( chosenFile.getPath() );
             } else if (idChannel == 2) {
-                fileChannel2.setText(chosenFile.getPath());
+                fileChannel2.setText ( chosenFile.getPath() );
             } else if (idChannel == 3) {
-                fileChannel3.setText(chosenFile.getPath());
+                fileChannel3.setText ( chosenFile.getPath() );
             } else if (idChannel == 4) {
-                fileChannel4.setText(chosenFile.getPath());
+                fileChannel4.setText ( chosenFile.getPath() );
             } else if (idChannel == 5) {
-                fileChannel5.setText(chosenFile.getPath());
+                fileChannel5.setText ( chosenFile.getPath() );
             } else if (idChannel == 6) {
-                fileChannel6.setText(chosenFile.getPath());
+                fileChannel6.setText ( chosenFile.getPath() );
             } else if (idChannel == 7) {
-                fileChannel7.setText(chosenFile.getPath());
+                fileChannel7.setText ( chosenFile.getPath() );
             } else if (idChannel == 8) {
-                fileChannel8.setText(chosenFile.getPath());
+                fileChannel8.setText ( chosenFile.getPath() );
             }
 
             return chosenFile;
@@ -719,6 +695,8 @@ public class Player extends javax.swing.JFrame {
     }
 
     /**
+     * Main method. Creates the main page and starts the application itself.
+     * 
      * @param args the command line arguments
      */
     public static void main(String args[]) {
@@ -747,6 +725,7 @@ public class Player extends javax.swing.JFrame {
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new Player().setVisible(true);
             }
@@ -796,8 +775,4 @@ public class Player extends javax.swing.JFrame {
     private javax.swing.JButton playChannel7;
     private javax.swing.JButton playChannel8;
     // End of variables declaration//GEN-END:variables
-
-    private FileFilter NewFileFilter() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }
