@@ -9,21 +9,16 @@ package javaappsoundtest;
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
-import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.util.HashSet;
 import java.util.Set;
-import static javaappsoundtest.Player.channel1;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioInputStream;
-import javax.sound.sampled.AudioSystem;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
 /**
+ * 
  *
- * @author imdc
+ * @author Rener Baffa da Silva
  */
 public class AsioSoundHost implements AsioDriverListener {
     
@@ -35,52 +30,53 @@ public class AsioSoundHost implements AsioDriverListener {
     private float[] output;
     
     private boolean[] channel;
-    private long startTime;  
-    
-    private double noteFrequency;
+    private long startTime;
     
     byte[] abBuffer;
     FileInputStream inputStream;
     
     int frameSize;
     
-    
+    /**
+     * Class constructor. This is the constructor of the class that initializes
+     * everything needed such as buffer size, list of active channels and output variable.
+     * 
+     * @param driver Receive the current driver to be used.
+     */
     AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
-            this.driver = driver;
-            this.driver.addAsioDriverListener ( this );
+            /* Get and instanciate the driver and its listener */
+                this.driver = driver;
+                this.driver.addAsioDriverListener ( this );
             
-            bufferSize = this.driver.getBufferPreferredSize();
-            sampleRate = this.driver.getSampleRate();
+            /* Get the the buffer preferred size and the sample rate from current driver */
+                bufferSize = this.driver.getBufferPreferredSize();
+                sampleRate = this.driver.getSampleRate();
           
-            output = new float[bufferSize];
-            activeChannels = new HashSet<>();
+            /* Initializing the variable that contains the sound information o be played */
+                output = new float[bufferSize];
             
-            activeChannels.add (this.driver.getChannelOutput(0));
-            activeChannels.add (this.driver.getChannelOutput(1));
-            activeChannels.add (this.driver.getChannelOutput(2));
-            activeChannels.add (this.driver.getChannelOutput(3));
-            activeChannels.add (this.driver.getChannelOutput(4));
-            activeChannels.add (this.driver.getChannelOutput(5));
-            activeChannels.add (this.driver.getChannelOutput(6));
-            activeChannels.add (this.driver.getChannelOutput(7));
-                        
-            channel = new boolean[8];
-            for ( int i = 0; i < channel.length; i++ ) {
-                channel[i] = false;
-            }
+            /* Add all the 7 channels of the chair to a list and then to the driver */
+                activeChannels = new HashSet<>();
+                for ( int i = 0; i < 8; i++ ) {
+                    activeChannels.add ( this.driver.getChannelOutput ( i ) );
+                }
+                this.driver.createBuffers ( activeChannels );
             
-            this.driver.createBuffers(activeChannels);
+            /* Create a list with all active channels */
+                channel = new boolean[8];
+                for ( int i = 0; i < channel.length; i++ ) {
+                    channel[i] = false;
+                }
             
-            noteFrequency = 800;
-            
-            try {
+            /* Is it needed? */
+            /*try {
                 AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(channel1);
                 AudioFormat audioFormat = fileFormat.getFormat();
 
                 frameSize = audioFormat.getFrameSize();
 
-                int nBufferSize = driver.getBufferPreferredSize();//1024 * audioFormat.getFrameSize();
+                int nBufferSize = driver.getBufferPreferredSize();
                 abBuffer = new byte[nBufferSize];
 
                 AudioInputStream inputAIS = AudioSystem.getAudioInputStream(channel1);
@@ -89,152 +85,63 @@ public class AsioSoundHost implements AsioDriverListener {
 
                 inputStream = new FileInputStream("c:\\Users\\imdc\\desktop\\2.wav");
 
-            } catch (Exception ex) {
-
-            }
-            
-            createSound();
+            } catch ( UnsupportedAudioFileException ex ) {
+                System.out.println ( ex );
+            } catch ( IOException ex ) {
+                System.out.println ( ex );
+            }*/
         }
     }
     
-    public void removeChannel ( int channel ) {
-        this.channel[channel] = false;
-    }
-    
+    /**
+     * This method add a new channel to the list of active channels.
+     * 
+     * @param channel This is the channel to be added into the active list.
+     */
     public void addChannel ( int channel ) {
         this.channel[channel] = true;
     }
-
-    private void createSound() {
-        for ( int i = 0; i < bufferSize; i++ ) 
-        {
-            try {
-               //output[i] = (float) Math.sin ( 2 * Math.PI * sampleIndex * 200.0 / sampleRate );
-               
-                float result = (float) Math.sin ( noteFrequency * 2 * Math.PI * i / sampleRate );
-                //output[i] = result * 10000;
-                
-                
-                //output[i] = (float) Player.output[i];
-                System.out.println ( output[i] );
-            }
-            catch ( Exception e ) {
-                System.out.println ( "EXCEPTION: " + e );
-            }
-        }
-        
-        System.out.println ( "asdasd" );
-        
-        /*output[0] = 0;
-        output[1] = 0;
-        output[2] = 0;
-        output[3] = 0;
-        output[4] = 0;
-        output[5] = 0;
-        output[6] = 0;
-        output[7] = 0;
-        output[8] = 0;
-        output[9] = 0;
-        output[10] = 0;
-        output[11] = 0;
-        output[12] = 0;
-        output[13] = 0;
-        output[14] = 0;
-        output[15] = 0.030517578125;
-        output[16] = 0.06103515625;
-        output[17] = 0.06103515625;
-        output[18] = -0.030517578125;
-        output[19] = -0.030517578125;
-        output[20] = 0.6103515625;
-        output[21] = -0.06103515625;
-        output[22] = 0.030517578125;
-        output[23] = 0.030517578125;
-        output[24] = -0.091552734375;
-        output[25] = 0.091552734375;
-        output[26] = -0.091552734375;
-        output[27] = 0.091552734375;
-        output[28] = -0.06103515625;
-        output[29] = 0.030517578125;
-        output[30] = -0.030517578125;
-        output[31] = 0;
-        output[32] = 0;
-        output[33] = -0.030517578125;
-        output[34] = 0.06103515625;
-        output[35] = -0.091552734375;
-        output[36] = 0.091552734375;
-        output[37] = -0.06103515625;
-        output[38] = 0.06103515625;
-        output[39] = -0.06103515625;
-        output[40] = 0.06103515625;
-        output[41] = -0.06103515625;
-        output[42] = 0.030517578125;
-        output[43] = 0;
-        output[44] = 0.030517578125;
-        output[45] = -0.06103515625;
-        output[46] = 0.091552734375;
-        output[47] = -0.091552734375;
-        output[48] = 0.030517578125;
-        output[49] = 0.06103515625;
-        output[50] = -0.01220703125;
-        output[51] = 0.01220703125;
-        output[52] = -0.091552734375;
-        output[53] = 0.06103515625;
-        output[54] = 0;
-        output[55] = -0.06103515625;
-        output[56] = -0.06103515625;
-        output[57] = 0.06103515625;*/
-
-    }
     
+    /**
+     * This method remove a channel to the list of active channels.
+     * 
+     * @param channel This is the channel to be removed of the active list.
+     */
+    public void removeChannel ( int channel ) {
+        this.channel[channel] = false;
+    }
+
     @Override
     public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
 
-        long elapsedTime = ((sampleTime - startTime) / 1000000);
+        /* Get the elapsed time (difference between the current time and the start time. */
+            long elapsedTime = ((sampleTime - startTime) / 1000000);
 
-        for (AsioChannel channelInfo : activeChannels) {
+        /* Runs all the channel in the active list */
+            for ( AsioChannel channelInfo : activeChannels ) {
+                /* Check if the current channel is active */
+                if ( channel[channelInfo.getChannelIndex()] ) {
+                    /* read the samples from the file. It has to be move to other place */
+                        byte[] sample = new byte[frameSize]; 
+                        try {
+                            for(int i = 0; i < output.length; i++) {
+                                for (int j = 0; j < sample.length; j++) {
+                                    sample[j] = (byte) inputStream.read();
+                                }
+                                float samplef = ByteBuffer.wrap(sample).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+                                output[i] = samplef;
 
-            if (channel[channelInfo.getChannelIndex()]) {
+                            }
+                        } catch (Exception ex) {
+                            System.out.println ( ex.getMessage() );
+                            break;
 
-                try 
-                {
-                    //inputStream.skip(44);
-                } 
-                catch (Exception ex) {
-
-                }
-                byte[] sample = new byte[frameSize]; 
-                try {
-                    for(int i = 0; i < output.length; i++)
-                    {
-                        for (int j = 0; j < sample.length; j++) 
-                        {
-                            sample[j] = (byte) inputStream.read();
                         }
-                       // ByteBuffer buffer = ByteBuffer.wrap(sample);
-                        
-                        //try{
-                        float samplef = ByteBuffer.wrap(sample).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                        output[i] = samplef;
-                      //  }
-                      //  catch(Exception ex)
-                      //  {
-                      //      System.out.println(ex.getMessage());
-                      //  }
-                        
-                    }
-                    
 
-                } catch (Exception ex) {
-                    System.out.println(ex.getMessage());
-                    break;
-
+                    /* play the information in the current channel */
+                    channelInfo.write ( output );
                 }
-                //output = abBuffer;
-                channelInfo.write(output);
-                // System.out.println(sampleTime + " " + samplePosition);//channelInfo.write ( output );
             }
-
-        }
     }
     
     @Override

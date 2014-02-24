@@ -1,9 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package javaappsoundtest;
 
 import com.synthbot.jasiohost.AsioDriver;
@@ -23,7 +17,7 @@ import java.util.List;
  * used by application. That information is recorded in a config.txt file and the application
  * tries to load that every time it initiates.
  *
- * @author imdc
+ * @author Rener Baffa da Silva
  */
 public class ControlPanel extends javax.swing.JFrame {
 
