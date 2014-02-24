@@ -6,7 +6,6 @@
 
 package javaappsoundtest;
 
-import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,83 +17,94 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
-import java.util.Set;
 
 /**
+ * This is the Control Panel form. In this form it is possible to select the sound driver
+ * used by application. That information is recorded in a config.txt file and the application
+ * tries to load that every time it initiates.
  *
  * @author imdc
  */
-public class ControlPanel extends javax.swing.JFrame implements com.synthbot.jasiohost.AsioDriverListener {
+public class ControlPanel extends javax.swing.JFrame {
 
     /**
-     * Creates new form ControlPanel
+     * Class constructor. This method creates a new control panel.
      */
     public ControlPanel() {
-        initComponents();
-               
-        comboBox.removeAllItems();
+        /* Method created automaticaly by NetBeans to position all elements in the screen */
+            initComponents();
         
-        List<String> list = AsioDriver.getDriverNames();
+        /* Put all available drivers in the combo box */
+            comboBox.removeAllItems();
+            List<String> list = AsioDriver.getDriverNames();
+
+            for ( String item: list ) {
+                comboBox.addItem ( item );
+            }
         
-        for ( String item: list ) {
-            comboBox.addItem ( item );
-        }
+        /**
+         * If the file config.txt exists, load all the pre-saved information.
+         * The information pattern of config.txt is:
+         * Field name<b>;</b>Content to be saved<b>;</b>Additional information
+         * Example:
+         * Audio Driver<b>;</b>ASIO PreSonus FireStudio<b>;</b>1 (Previously position in the combo box)
+         */
+            BufferedReader reader;
+            try {
+                if ( new File ( "config.txt" ).exists() ) {
+                    reader = new BufferedReader ( new FileReader ( "config.txt" ) );
+
+                    String line = null;
+
+                    while ( ( line = reader.readLine() ) != null ) {
+                        String split[] =  line.split ( ";" );
+
+                        /* If the current line contains the audio driver information, get that */
+                        if ( split[0].equals ( "Audio Driver" ) ) {
+                            comboBox.setSelectedIndex ( Integer.parseInt ( split[2] ) );
+                        }
+                    }
+
+                    reader.close();
+                }
+            } catch (FileNotFoundException ex) {
+                System.out.println ( ex );
+            } catch (IOException ex) {
+               System.out.println ( ex );
+            }
         
-        BufferedReader reader;
-        try {
-            if ( new File ( "config.txt" ).exists() ) {
-                reader = new BufferedReader ( new FileReader ( "config.txt" ) );
+        /**
+         * Create the listener to save button that save the current information in the config.txt file.
+         */
+            saveButton.addMouseListener ( new java.awt.event.MouseAdapter() {
+                public void mouseClicked ( java.awt.event.MouseEvent evt ) {
+                    File file = new File ( "config.txt" );
 
-                String line = null;
+                    try {
+                        //Need to ask before overwrite
+                        if ( file.exists() ) {
 
-                while ( ( line = reader.readLine() ) != null ) {
-                    String split[] =  line.split ( ";" );
+                        }       
 
-                    if ( split[0].equals ( "Audio Driver" ) ) {
-                        comboBox.setSelectedIndex ( Integer.parseInt ( split[2] ) );
+                        file.createNewFile();
+                        Writer writer = new BufferedWriter ( new OutputStreamWriter ( new FileOutputStream ( "config.txt" ), "utf-8" ) );
+                        /* Write the information according to the pattern */
+                        writer.write ( "Audio Driver;" + comboBox.getSelectedItem() + ";" +comboBox.getSelectedIndex() );
+                        writer.close();
+
+                    } catch (FileNotFoundException ex) {
+                        System.out.println ( ex );
+                    } catch (IOException ex) {
+                        System.out.println ( ex );
                     }
                 }
-                
-                reader.close();
-            }
-        } catch (FileNotFoundException ex) {
-            System.out.println ( ex );
-        } catch (IOException ex) {
-           System.out.println ( ex );
-        }
-        
-        /******                                        UNCOMMENT HERE!                                        ******/
-        
-        //Converter.driver = AsioDriver.getDriver ( comboBox.getSelectedItem().toString() );
-        
-        saveButton.addMouseListener ( new java.awt.event.MouseAdapter() {
-            public void mouseClicked ( java.awt.event.MouseEvent evt ) {
-                File file = new File ( "config.txt" );
-                
-                try {
-                    //Need to ask before overwrite
-                    if ( file.exists() ) {
-                        
-                    }       
-
-                    file.createNewFile();
-                    Writer writer = new BufferedWriter ( new OutputStreamWriter ( new FileOutputStream ( "config.txt" ), "utf-8" ) );
-                    writer.write ( "Audio Driver;" + comboBox.getSelectedItem() + ";" +comboBox.getSelectedIndex() );
-                    writer.close();
-                    
-                } catch (FileNotFoundException ex) {
-                    System.out.println ( ex );
-                } catch (IOException ex) {
-                    System.out.println ( ex );
-                }
-            }
-        });
+            });
     }
 
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
-     * regenerated by the Form Editor.
+     * regenerated by the NetBeans Form Editor.
      */
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
@@ -143,7 +153,9 @@ public class ControlPanel extends javax.swing.JFrame implements com.synthbot.jas
     }// </editor-fold>//GEN-END:initComponents
 
     /**
-     * @param args the command line arguments
+     * Main method. It starts the application itself.
+     * 
+     * @param args the command line arguments (created automatically)
      */
     public static void main(String args[]) {
         /* Set the Nimbus look and feel */
@@ -170,11 +182,11 @@ public class ControlPanel extends javax.swing.JFrame implements com.synthbot.jas
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new ControlPanel().setVisible(true);
-            }
-        });
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    new ControlPanel().setVisible(true);
+                }
+            });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -182,34 +194,4 @@ public class ControlPanel extends javax.swing.JFrame implements com.synthbot.jas
     private javax.swing.JLabel jLabel1;
     private javax.swing.JButton saveButton;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void sampleRateDidChange(double sampleRate) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void resetRequest() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void resyncRequest() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void bufferSizeChanged(int bufferSize) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void latenciesChanged(int inputLatency, int outputLatency) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
 }
