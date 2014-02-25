@@ -3,11 +3,17 @@ package javaappsoundtest;
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * This is the AsioSoundHost class. It implements AsioDriverListener. That is the
@@ -42,10 +48,11 @@ public class AsioSoundHost implements AsioDriverListener {
     private long startTime;
     
     /* Can we throw it out when move the file load? */
-        byte[] abBuffer;
         FileInputStream inputStream;
-
+        
         int frameSize;
+        
+        int currentCounter;
     
     /**
      * Class constructor. This is the constructor of the class that initializes
@@ -80,26 +87,20 @@ public class AsioSoundHost implements AsioDriverListener {
                 }
             
             /* Is it needed? */
-            /*try {
-                AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat(channel1);
+            try {
+                File file = Player.channels.get ( 1 );
+                AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat ( file );
                 AudioFormat audioFormat = fileFormat.getFormat();
 
                 frameSize = audioFormat.getFrameSize();
 
-                int nBufferSize = driver.getBufferPreferredSize();
-                abBuffer = new byte[nBufferSize];
+                inputStream = new FileInputStream ( file );
 
-                AudioInputStream inputAIS = AudioSystem.getAudioInputStream(channel1);
-
-                ByteArrayOutputStream baos = new ByteArrayOutputStream();
-
-                inputStream = new FileInputStream("c:\\Users\\imdc\\desktop\\2.wav");
-
-            } catch ( UnsupportedAudioFileException ex ) {
-                System.out.println ( ex );
             } catch ( IOException ex ) {
                 System.out.println ( ex );
-            }*/
+            } catch (UnsupportedAudioFileException ex) {
+                System.out.println ( ex );
+            }
         }
     }
     
@@ -120,7 +121,7 @@ public class AsioSoundHost implements AsioDriverListener {
     public void removeChannel ( int channel ) {
         this.channel[channel] = false;
     }
-
+    
     @Override
     public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
 
@@ -131,23 +132,11 @@ public class AsioSoundHost implements AsioDriverListener {
             for ( AsioChannel channelInfo : activeChannels ) {
                 /* Check if the current channel is active */
                 if ( channel[channelInfo.getChannelIndex()] ) {
-                    /* read the samples from the file. It has to be move to other place */
-                        byte[] sample = new byte[frameSize]; 
-                        try {
-                            for(int i = 0; i < output.length; i++) {
-                                for (int j = 0; j < sample.length; j++) {
-                                    sample[j] = (byte) inputStream.read();
-                                }
-                                float samplef = ByteBuffer.wrap(sample).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-                                output[i] = samplef;
-
-                            }
-                        } catch (Exception ex) {
-                            System.out.println ( ex.getMessage() );
-                            break;
-
+                    for( int i = 0; i < output.length; i++, currentCounter++) {
+                        if ( Player.output.get ( currentCounter ) != null ) {
+                            output[i] = Player.output.get ( currentCounter );
                         }
-
+                    }
                     /* play the information in the current channel */
                     channelInfo.write ( output );
                 }
