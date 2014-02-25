@@ -9,10 +9,16 @@ import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverState;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.SocketException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import javax.sound.sampled.AudioFileFormat;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioSystem;
 import javax.swing.JFileChooser;
 
 /**
@@ -36,13 +42,13 @@ public class Player extends javax.swing.JFrame {
      * @param output            Sound information to be played.
      * @param playingChannel    List of channels that are playing the sound.
      */
-    private File channel1, channel2, channel3, channel4, channel5, channel6, channel7, channel8;
+    public static ArrayList<File> channels;
 
     private AsioDriver driver;
     private AsioSoundHost listener;
 
     /* Change that to an array?! */
-    public static byte[] output;
+    public static ArrayList<Float> output;
 
     private boolean[] playingChannel;
 
@@ -51,15 +57,49 @@ public class Player extends javax.swing.JFrame {
      */
     public Player() {
         
-        try {
-            Server server = new Server ( 7400 );
-
-            server.start();
+        /*try {
+            DatagramSocket serverSocket = new DatagramSocket ( 7400 );
+        
+            byte[] receivedData = new byte[1024];
+            
+            while ( true ) {
+                DatagramPacket receivedPacket = new DatagramPacket ( receivedData, receivedData.length );
+                serverSocket.receive ( receivedPacket );
+                
+                
+                String sentence = new String ( receivedPacket.getData() );
+                
+                String[] message = sentence.split ( ";" );
+                
+                switch ( message[0] ) {
+                    case "stop":
+                        //System.out.println("Driver stopped.");
+                        //listener.removeAllChannels();
+                        //driver.returnToState ( AsioDriverState.INITIALIZED );
+                        break;
+                    
+                    default:
+                        if ( driver.getCurrentState() != AsioDriverState.RUNNING ) {
+                            
+                            //this.musicName = message[0];
+                            //listener.setMusicName(message);
+                            
+                            listener = new AsioSoundHost ( driver );
+                            //listener.setStartTime();
+                            driver.start();
+                            System.out.println("Driver started.");
+                            
+                            //driver.returnToState ( AsioDriverState.PREPARED );
+                        }
+                        break;
+                }
+                
+            }
         } catch (SocketException ex) {
             System.out.println ( ex );
         } catch (IOException ex) {
             System.out.println ( ex );
-        }
+        }*/
         
         /* Method created automaticaly by NetBeans to position all elements in the screen */
             initComponents();
@@ -99,12 +139,22 @@ public class Player extends javax.swing.JFrame {
             } catch (IOException ex) {
                 System.out.println(ex);
             }
+            
+           
+        output = new ArrayList<>();
+        channels = new ArrayList<>();
+        
+        for ( int i = 0; i < 9; i++ ) {
+            channels.add ( i, null );
+        }
 
         /* Listener to load the file chosen to the channel 1 variable. It maps the event of click on the Text Field. */
         fileChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel1 = getFile(evt, 1);
+                int currentChannel = 1;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -112,7 +162,9 @@ public class Player extends javax.swing.JFrame {
         labelChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel1 = getFile(evt, 1);
+                int currentChannel = 1;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -120,7 +172,9 @@ public class Player extends javax.swing.JFrame {
         fileChannel2.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel2 = getFile(evt, 2);
+                int currentChannel = 2;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -128,7 +182,9 @@ public class Player extends javax.swing.JFrame {
         labelChannel2.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel2 = getFile(evt, 2);
+                int currentChannel = 2;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -136,7 +192,9 @@ public class Player extends javax.swing.JFrame {
         fileChannel3.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel3 = getFile(evt, 3);
+                int currentChannel = 3;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -144,7 +202,9 @@ public class Player extends javax.swing.JFrame {
         labelChannel3.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel3 = getFile(evt, 3);
+                int currentChannel = 3;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -152,7 +212,9 @@ public class Player extends javax.swing.JFrame {
         fileChannel4.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel4 = getFile(evt, 4);
+                int currentChannel = 4;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -160,7 +222,9 @@ public class Player extends javax.swing.JFrame {
         labelChannel4.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel4 = getFile(evt, 4);
+                int currentChannel = 4;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -168,7 +232,9 @@ public class Player extends javax.swing.JFrame {
         fileChannel5.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel5 = getFile(evt, 5);
+                int currentChannel = 5;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -176,7 +242,9 @@ public class Player extends javax.swing.JFrame {
         labelChannel5.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel5 = getFile(evt, 5);
+                int currentChannel = 5;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -184,7 +252,9 @@ public class Player extends javax.swing.JFrame {
         fileChannel6.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel6 = getFile(evt, 6);
+                int currentChannel = 6;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -192,7 +262,9 @@ public class Player extends javax.swing.JFrame {
         labelChannel6.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel6 = getFile(evt, 6);
+                int currentChannel = 6;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -200,7 +272,9 @@ public class Player extends javax.swing.JFrame {
         fileChannel7.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel7 = getFile(evt, 7);
+                int currentChannel = 7;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -208,7 +282,9 @@ public class Player extends javax.swing.JFrame {
         labelChannel7.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel7 = getFile(evt, 7);
+                int currentChannel = 7;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -216,7 +292,9 @@ public class Player extends javax.swing.JFrame {
         fileChannel8.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel8 = getFile(evt, 8);
+                int currentChannel = 8;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
@@ -224,10 +302,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel8.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                channel8 = getFile(evt, 8);
+                int currentChannel = 8;
+                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
+                loadFile ( currentChannel );
             }
         });
 
+        
+        
         /* Listener to control panel button. Control panel form opens */
         controlPanelBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
@@ -237,6 +319,7 @@ public class Player extends javax.swing.JFrame {
             }
         });
 
+        
         
         /* Listener to start button to play the sound in the channel 1 */
         playChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -676,34 +759,80 @@ public class Player extends javax.swing.JFrame {
             fc.setFileFilter(new SoundsFilter());
 
         /* Check if the file was chosen. If yes so return the file. If not so return null. */
-        int returnedValue = fc.showDialog(rootPane, null);
-        
-        if (returnedValue == JFileChooser.APPROVE_OPTION) {
-            /* Create the file with chosen path and  */
-            File chosenFile = fc.getSelectedFile();
+            int returnedValue = fc.showDialog(rootPane, null);
 
-            if (idChannel == 1) {
-                fileChannel1.setText ( chosenFile.getPath() );
-            } else if (idChannel == 2) {
-                fileChannel2.setText ( chosenFile.getPath() );
-            } else if (idChannel == 3) {
-                fileChannel3.setText ( chosenFile.getPath() );
-            } else if (idChannel == 4) {
-                fileChannel4.setText ( chosenFile.getPath() );
-            } else if (idChannel == 5) {
-                fileChannel5.setText ( chosenFile.getPath() );
-            } else if (idChannel == 6) {
-                fileChannel6.setText ( chosenFile.getPath() );
-            } else if (idChannel == 7) {
-                fileChannel7.setText ( chosenFile.getPath() );
-            } else if (idChannel == 8) {
-                fileChannel8.setText ( chosenFile.getPath() );
+            if (returnedValue == JFileChooser.APPROVE_OPTION) {
+                /* Create the file with chosen path and  */
+                File chosenFile = fc.getSelectedFile();
+
+                if (idChannel == 1) {
+                    fileChannel1.setText ( chosenFile.getPath() );
+                } else if (idChannel == 2) {
+                    fileChannel2.setText ( chosenFile.getPath() );
+                } else if (idChannel == 3) {
+                    fileChannel3.setText ( chosenFile.getPath() );
+                } else if (idChannel == 4) {
+                    fileChannel4.setText ( chosenFile.getPath() );
+                } else if (idChannel == 5) {
+                    fileChannel5.setText ( chosenFile.getPath() );
+                } else if (idChannel == 6) {
+                    fileChannel6.setText ( chosenFile.getPath() );
+                } else if (idChannel == 7) {
+                    fileChannel7.setText ( chosenFile.getPath() );
+                } else if (idChannel == 8) {
+                    fileChannel8.setText ( chosenFile.getPath() );
+                }
+                
+                return chosenFile;
             }
 
-            return chosenFile;
-        }
+            return null;
+    }
+    
+    private void loadFile ( int channel ) {
+        try {
+            File file = channels.get ( channel );
+            AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat ( file );
+            AudioFormat audioFormat = fileFormat.getFormat();
 
-        return null;
+            byte[] sample = new byte[audioFormat.getFrameSize()];
+            FileInputStream inputStream = new FileInputStream ( file );
+            
+            boolean continueLoop = true;
+            int j = 0;
+            int errors = 0;
+
+            //for(int i = 0; i < output.length; i++) {
+            while ( continueLoop ) {
+                sample[j] = (byte) inputStream.read();
+                if ( errors > 5 ) {
+                    break;
+                }
+                
+                if ( j == sample.length - 1 ) {
+                    float samplef;
+                    samplef = ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ).getFloat();
+                    if ( samplef != Double.NaN ) {
+                        output.add ( samplef );
+                    }
+
+                    if ( sample[0] == -1 && sample[1] == -1 && sample[2] == -1 && sample[3] == -1 ) {
+                        errors++;
+                    }
+                    
+                    j = 0;
+                }
+                else {
+                    if ( j < sample.length - 1 ) {
+                        j++;
+                    }
+                }
+            }
+            
+            //System.out.println ( "Asdasd" );
+        } catch (Exception ex) {
+            System.out.println ( ex );
+        }
     }
 
     /**
