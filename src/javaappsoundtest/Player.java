@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.SocketException;
 import javax.swing.JFileChooser;
 
 /**
@@ -49,6 +50,17 @@ public class Player extends javax.swing.JFrame {
      * Class constructor. Load the previously information and initializes everything needed such as the driver.
      */
     public Player() {
+        
+        try {
+            Server server = new Server ( 7400 );
+
+            server.start();
+        } catch (SocketException ex) {
+            System.out.println ( ex );
+        } catch (IOException ex) {
+            System.out.println ( ex );
+        }
+        
         /* Method created automaticaly by NetBeans to position all elements in the screen */
             initComponents();
 
