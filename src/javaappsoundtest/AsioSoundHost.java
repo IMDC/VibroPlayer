@@ -3,15 +3,9 @@ package javaappsoundtest;
 import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
-import java.io.File;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import javax.sound.sampled.AudioFileFormat;
-import javax.sound.sampled.AudioFormat;
-import javax.sound.sampled.AudioSystem;
-import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
  * This is the AsioSoundHost class. It implements AsioDriverListener. That is the
@@ -58,7 +52,7 @@ public class AsioSoundHost implements AsioDriverListener {
      * 
      * @param driver Receive the current driver to be used.
      */
-    AsioSoundHost ( AsioDriver driver ) {
+    AsioSoundHost ( AsioDriver driver, String musicName ) {
         if ( driver != null ) {
             /* Get and instanciate the driver and its listener */
                 this.driver = driver;
@@ -81,25 +75,17 @@ public class AsioSoundHost implements AsioDriverListener {
             /* Create a list with all active channels */
                 channel = new boolean[8];
                 for ( int i = 0; i < channel.length; i++ ) {
-                    channel[i] = false;
+                    channel[i] = true;
                 }
-            
-            /* Is it needed? */
-            try {
-                File file = Player.channels.get ( 1 );
-                AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat ( file );
-                AudioFormat audioFormat = fileFormat.getFormat();
-
-                frameSize = audioFormat.getFrameSize();
-
-                inputStream = new FileInputStream ( file );
-
-            } catch ( IOException ex ) {
-                System.out.println ( ex );
-            } catch (UnsupportedAudioFileException ex) {
-                System.out.println ( ex );
-            }
+                
+                for ( int i = 0; i < channel.length; i++ ) {
+                    addChannel(i);
+                }
         }
+    }
+    
+    public void restart() {
+        this.currentCounter = 0;
     }
     
     /**
@@ -134,16 +120,16 @@ public class AsioSoundHost implements AsioDriverListener {
 
         /* Get the elapsed time (difference between the current time and the start time and convert it to seconds. */
             long elapsedTime = ((sampleTime - startTime) / 1000000);
+            
+            for( int i = 0; i < output.length; i++, currentCounter++) {
+                output[i] = Server.musics.get ( 0 ).getFloat ( currentCounter );
+                //System.out.println ( currentCounter );
+            }
 
         /* Runs all the channel in the active list */
             for ( AsioChannel channelInfo : activeChannels ) {
                 /* Check if the current channel is active */
                 if ( channel[channelInfo.getChannelIndex()] ) {
-                    for( int i = 0; i < output.length; i++, currentCounter++) {
-                        if ( Player.output.get ( currentCounter ) != null ) {
-                            output[i] = Player.output.get ( currentCounter );
-                        }
-                    }
                     /* play the information in the current channel */
                     channelInfo.write ( output );
                 }

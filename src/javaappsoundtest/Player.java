@@ -398,7 +398,7 @@ public class Player extends javax.swing.JFrame {
 
         /* Check if the driver is already running. If not, starts it */
             if ( driver.getCurrentState() != AsioDriverState.RUNNING ) {
-                listener = new AsioSoundHost(driver);
+                //listener = new AsioSoundHost(driver);
                 driver.start();
             }
 
@@ -868,7 +868,8 @@ public class Player extends javax.swing.JFrame {
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new Player().setVisible(true);
+                //new Player().setVisible(true);
+                Server server = new Server();
             }
         });
     }
