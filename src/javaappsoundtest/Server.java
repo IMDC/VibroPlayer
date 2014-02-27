@@ -41,8 +41,8 @@ public class Server extends javax.swing.JFrame {
         
         try {
             musics = new ArrayList<>();
-            musics.add ( new Music ( "Oral sex", "C:\\Users\\imdc\\Desktop\\Sound files\\Sound files\\sexual sounds\\oral2.wav" ) );
-            //musics.add ( new Music ( "Kissing", "C:\\Users\\imdc\\Desktop\\Sound files\\Sound files\\sexual sounds\\kissing2.wav" ) );
+            //musics.add ( new Music ( "Oral sex", "C:\\Users\\imdc\\Desktop\\Sound files\\Sound files\\sexual sounds\\oral2.wav" ) );
+            musics.add ( new Music ( "Kissing", "C:\\Users\\imdc\\Desktop\\Sound files\\Sound files\\sexual sounds\\kissing2.wav" ) );
         } catch ( UnsupportedAudioFileException ex ) {
             System.out.println ( ex );
         } catch (IOException ex) {
@@ -112,8 +112,8 @@ public class Server extends javax.swing.JFrame {
                 switch ( message[0] ) {
                     case "stop":
                         System.out.println("Driver stopped.");
-                        //listener.removeAllChannels();
                         listener.restart();
+                        driver.removeAsioDriverListener ( listener );
                         driver.returnToState ( AsioDriverState.INITIALIZED );
                         break;
                     
