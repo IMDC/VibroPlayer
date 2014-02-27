@@ -447,9 +447,6 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Play Song"/>
       </Properties>
-      <Events>
-        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="playAllSoungActionPerformed"/>
-      </Events>
     </Component>
   </SubComponents>
 </Form>

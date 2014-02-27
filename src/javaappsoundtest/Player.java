@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 
 /**
@@ -43,6 +44,7 @@ public class Player extends javax.swing.JFrame {
      * @param playingChannel    List of channels that are playing the sound.
      */
     public static ArrayList<File> channels;
+    public static ArrayList<Music> musics;
 
     private AsioDriver driver;
     private AsioSoundHost listener;
@@ -96,19 +98,25 @@ public class Player extends javax.swing.JFrame {
             }
             
         output = new ArrayList<>();
-        channels = new ArrayList<>();
+        musics = new ArrayList<>();
         
         for ( int i = 0; i < 9; i++ ) {
-            channels.add ( i, null );
+            musics.add ( i, null );
         }
 
+        
         /* Listener to load the file chosen to the channel 1 variable. It maps the event of click on the Text Field. */
         fileChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 1;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 1;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -116,9 +124,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel1.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 1;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 1;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -126,9 +139,14 @@ public class Player extends javax.swing.JFrame {
         fileChannel2.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 2;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 2;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -136,9 +154,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel2.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 2;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 2;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -146,9 +169,14 @@ public class Player extends javax.swing.JFrame {
         fileChannel3.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 3;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 3;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -156,9 +184,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel3.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 3;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 3;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -166,9 +199,14 @@ public class Player extends javax.swing.JFrame {
         fileChannel4.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 4;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 4;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -176,9 +214,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel4.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 4;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 4;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -186,9 +229,14 @@ public class Player extends javax.swing.JFrame {
         fileChannel5.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 5;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 5;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -196,9 +244,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel5.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 5;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 5;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -206,9 +259,14 @@ public class Player extends javax.swing.JFrame {
         fileChannel6.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 6;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 6;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -216,9 +274,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel6.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 6;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 6;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -226,9 +289,14 @@ public class Player extends javax.swing.JFrame {
         fileChannel7.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 7;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 7;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -236,9 +304,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel7.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 7;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 7;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -246,9 +319,14 @@ public class Player extends javax.swing.JFrame {
         fileChannel8.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 8;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 8;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
 
@@ -256,9 +334,14 @@ public class Player extends javax.swing.JFrame {
         labelChannel8.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                int currentChannel = 8;
-                channels.add ( currentChannel, getFile ( evt, currentChannel ) );
-                loadFile ( currentChannel );
+                try {
+                    int currentChannel = 8;
+                    importMusicToChannel ( currentChannel );
+                } catch ( UnsupportedAudioFileException ex ) {
+                    System.out.println ( ex );
+                } catch ( IOException ex ) {
+                    System.out.println ( ex );
+                }
             }
         });
         
@@ -369,6 +452,15 @@ public class Player extends javax.swing.JFrame {
                 return "Stop";
             }
 
+    }
+    
+    private void importMusicToChannel ( int channel ) throws UnsupportedAudioFileException, IOException {
+        String path = getFile ( channel );
+        Music music = new Music ( "channel " + channel , path );
+
+        music.readMusic();
+
+        musics.add ( channel, music );
     }
 
     /**
@@ -507,11 +599,6 @@ public class Player extends javax.swing.JFrame {
         playChannel8.setText("Play");
 
         playAllSoung.setText("Play Song");
-        playAllSoung.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                playAllSoungActionPerformed(evt);
-            }
-        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -687,25 +774,13 @@ public class Player extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    /* Listener to play song in all channels */
-    private void playAllSoungActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playAllSoungActionPerformed
-        start(0);
-        start(1);
-        start(2);
-        start(3);
-        start(4);
-        start(5);
-        start(6);
-        start(7);
-    }//GEN-LAST:event_playAllSoungActionPerformed
-
     /**
      * Get file method. Load the file and record it in the correspondent variable.
      * 
      * @param idChannel Specifies from what channel that file is.
      * @return Chosen file if it exists or null for the case that any file wasn't chosen.
      */
-    private File getFile(java.awt.event.MouseEvent evt, int idChannel) {
+    private String getFile ( int idChannel ) {
         /* Creates the dialog and uses a filter to just show sound files
          * (specified in the SoundsFilter class).
          */
@@ -713,34 +788,34 @@ public class Player extends javax.swing.JFrame {
             fc.setFileFilter(new SoundsFilter());
 
         /* Check if the file was chosen. If yes so return the file. If not so return null. */
-        int returnedValue = fc.showDialog(rootPane, null);
-        
-        if (returnedValue == JFileChooser.APPROVE_OPTION) {
-            /* Create the file with chosen path and  */
-            File chosenFile = fc.getSelectedFile();
+            int returnedValue = fc.showDialog(rootPane, null);
 
-            if (idChannel == 1) {
-                fileChannel1.setText ( chosenFile.getPath() );
-            } else if (idChannel == 2) {
-                fileChannel2.setText ( chosenFile.getPath() );
-            } else if (idChannel == 3) {
-                fileChannel3.setText ( chosenFile.getPath() );
-            } else if (idChannel == 4) {
-                fileChannel4.setText ( chosenFile.getPath() );
-            } else if (idChannel == 5) {
-                fileChannel5.setText ( chosenFile.getPath() );
-            } else if (idChannel == 6) {
-                fileChannel6.setText ( chosenFile.getPath() );
-            } else if (idChannel == 7) {
-                fileChannel7.setText ( chosenFile.getPath() );
-            } else if (idChannel == 8) {
-                fileChannel8.setText ( chosenFile.getPath() );
+            if (returnedValue == JFileChooser.APPROVE_OPTION) {
+                /* Create the file with chosen path and  */
+                String path = fc.getSelectedFile().getPath();
+
+                if (idChannel == 1) {
+                    fileChannel1.setText ( path );
+                } else if (idChannel == 2) {
+                    fileChannel2.setText ( path );
+                } else if (idChannel == 3) {
+                    fileChannel3.setText ( path );
+                } else if (idChannel == 4) {
+                    fileChannel4.setText ( path );
+                } else if (idChannel == 5) {
+                    fileChannel5.setText ( path );
+                } else if (idChannel == 6) {
+                    fileChannel6.setText ( path );
+                } else if (idChannel == 7) {
+                    fileChannel7.setText ( path );
+                } else if (idChannel == 8) {
+                    fileChannel8.setText ( path );
+                }
+                
+                return path;
             }
 
-            return chosenFile;
-        }
-
-        return null;
+            return null;
     }
 
     private void loadFile ( int channel ) {
