@@ -8,8 +8,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.HashSet;
 import java.util.Set;
-import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -52,7 +50,7 @@ public class AsioSoundHost implements AsioDriverListener {
         
         int frameSize;
         
-        int currentCounter;
+        int currentCounter = 0;
     
     /**
      * Class constructor. This is the constructor of the class that initializes
@@ -85,23 +83,11 @@ public class AsioSoundHost implements AsioDriverListener {
                 for ( int i = 0; i < channel.length; i++ ) {
                     channel[i] = false;
                 }
-            
-            /* Is it needed? */
-            try {
-                File file = Player.channels.get ( 1 );
-                AudioFileFormat fileFormat = AudioSystem.getAudioFileFormat ( file );
-                AudioFormat audioFormat = fileFormat.getFormat();
-
-                frameSize = audioFormat.getFrameSize();
-
-                inputStream = new FileInputStream ( file );
-
-            } catch ( IOException ex ) {
-                System.out.println ( ex );
-            } catch (UnsupportedAudioFileException ex) {
-                System.out.println ( ex );
-            }
         }
+    }
+    
+    public void restart() {
+        this.currentCounter = 0;
     }
     
     /**
@@ -127,16 +113,16 @@ public class AsioSoundHost implements AsioDriverListener {
 
         /* Get the elapsed time (difference between the current time and the start time and convert it to seconds. */
             long elapsedTime = ((sampleTime - startTime) / 1000000);
+            
+            for( int i = 0; i < output.length; i++, currentCounter++) {
+                output[i] = Player.musics.get ( 0 ).getFloat ( currentCounter );
+                //System.out.println ( currentCounter );
+            }
 
         /* Runs all the channel in the active list */
             for ( AsioChannel channelInfo : activeChannels ) {
                 /* Check if the current channel is active */
                 if ( channel[channelInfo.getChannelIndex()] ) {
-                    for( int i = 0; i < output.length; i++, currentCounter++) {
-                        if ( Player.output.get ( currentCounter ) != null ) {
-                            output[i] = Player.output.get ( currentCounter );
-                        }
-                    }
                     /* play the information in the current channel */
                     channelInfo.write ( output );
                 }
