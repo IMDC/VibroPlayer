@@ -43,9 +43,12 @@ public class AsioSoundHost implements AsioDriverListener {
         FileInputStream inputStream;
 
         int frameSize;
-    
-        int currentCounter = 0;
         
+        int startFloat = 20;
+    
+        int currentCounter = startFloat;
+        
+        String musicToPlay;
     /**
      * Class constructor. This is the constructor of the class that initializes
      * everything needed such as buffer size, list of active channels and output variable.
@@ -81,11 +84,14 @@ public class AsioSoundHost implements AsioDriverListener {
                 for ( int i = 0; i < channel.length; i++ ) {
                     addChannel(i);
                 }
+                
+                this.musicToPlay = musicName;
         }
     }
     
     public void restart() {
-        this.currentCounter = 0;
+        this.currentCounter = startFloat;
+        this.musicToPlay = Server.musicName;
     }
     
     /**
@@ -121,9 +127,15 @@ public class AsioSoundHost implements AsioDriverListener {
         /* Get the elapsed time (difference between the current time and the start time and convert it to seconds. */
             long elapsedTime = ((sampleTime - startTime) / 1000000);
             
-            for( int i = 0; i < output.length; i++, currentCounter++) {
-                output[i] = Server.musics.get ( 0 ).getFloat ( currentCounter );
-                //System.out.println ( currentCounter );
+            for( int i = 0; i < output.length ; i++, currentCounter++) {
+                Music m = Server.getMusicByName ( musicToPlay );
+                
+                //this is to repeat the sound
+                if ( currentCounter >= m.getMaxCount() - 1500 ) {
+                    this.restart();
+                }
+
+                output[i] = m.getFloat ( currentCounter );
             }
 
         /* Runs all the channel in the active list */
@@ -134,6 +146,8 @@ public class AsioSoundHost implements AsioDriverListener {
                     channelInfo.write ( output );
                 }
             }
+            
+            output = new float[bufferSize];
     }
     
     @Override

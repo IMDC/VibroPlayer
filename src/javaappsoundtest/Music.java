@@ -28,6 +28,7 @@ public class Music {
     private String filePath;
     private File file;
     private String name;
+    private int maxCount;
     
     private AudioFileFormat fileFormat;
     private AudioFormat audioFormat;
@@ -54,6 +55,10 @@ public class Music {
         return this.name;
     }
     
+    public int getMaxCount() {
+        return this.maxCount;
+    }
+    
     public void readMusic() throws FileNotFoundException, IOException {
         byte[] sample = new byte[audioFormat.getFrameSize()];
         FileInputStream inputStream = new FileInputStream ( this.file );
@@ -71,7 +76,7 @@ public class Music {
             if ( j == sample.length - 1 ) {
                 float samplef;
                 samplef = ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ).getFloat();
-                if ( samplef != Double.NaN ) {
+                if ( samplef != Double.NaN || samplef != Float.NaN ) {
                     this.output.add ( samplef );
                 }
 
@@ -87,5 +92,16 @@ public class Music {
                 }
             }
         }
+        
+        for ( int i = 0; i < this.output.size(); i++ ) {
+            float f = this.output.get ( i );
+            
+            if ( f != f ) {
+                this.output.remove ( i );
+                i--;
+            }
+        }
+        
+        this.maxCount = this.output.size();
     }
 }
