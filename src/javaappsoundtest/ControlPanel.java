@@ -28,7 +28,7 @@ public class ControlPanel extends javax.swing.JFrame {
         /* Method created automaticaly by NetBeans to position all elements in the screen */
             initComponents();
         
-        /* Put only presonus driver in the combo box */
+        /* Add only presonus driver in the combo box */
             comboBox.removeAllItems();
             List<String> list = AsioDriver.getDriverNames();
 
