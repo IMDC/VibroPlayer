@@ -42,7 +42,7 @@ public class ControlPanel extends javax.swing.JFrame {
          * The information pattern of config.txt is:
          * Field name<b>;</b>Content to be saved<b>;</b>Additional information
          * Example:
-         * Audio Driver<b>;</b>ASIO PreSonus FireStudio<b>;</b>1 (Previously position in the combo box)
+         * Audio Driver<b>;</b>ASIO PreSonus FireStudio<b>;</b>
          */
             BufferedReader reader;
             try {
