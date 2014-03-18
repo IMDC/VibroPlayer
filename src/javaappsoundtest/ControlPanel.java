@@ -28,11 +28,12 @@ public class ControlPanel extends javax.swing.JFrame {
         /* Method created automaticaly by NetBeans to position all elements in the screen */
             initComponents();
         
-        /* Put all available drivers in the combo box */
+        /* Put only presonus driver in the combo box */
             comboBox.removeAllItems();
             List<String> list = AsioDriver.getDriverNames();
 
             for ( String item: list ) {
+                if (item.equals("ASIO PreSonus FireStudio"))
                 comboBox.addItem ( item );
             }
         
