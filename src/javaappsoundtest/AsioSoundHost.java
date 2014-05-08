@@ -91,7 +91,9 @@ public class AsioSoundHost implements AsioDriverListener {
     
     public void restart() {
         this.currentCounter = startFloat;
-        this.musicToPlay = Server.musicName;
+        if ( Server.musicName != "stop" || Server.musicName != "stand" ) {
+            this.musicToPlay = Server.musicName;
+        }
     }
     
     /**
@@ -121,11 +123,19 @@ public class AsioSoundHost implements AsioDriverListener {
         return frameSize;
     }
     
+    public String getMusicName() {
+        return this.musicToPlay;
+    }
+    
     @Override
     public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
 
         /* Get the elapsed time (difference between the current time and the start time and convert it to seconds. */
             long elapsedTime = ((sampleTime - startTime) / 1000000);
+            
+            if ( Server.musicName != "stop" || Server.musicName != "stand" ) {
+                musicToPlay = Server.musicName;
+            }
             
             for( int i = 0; i < output.length ; i++, currentCounter++) {
                 Music m = Server.getMusicByName ( musicToPlay );
