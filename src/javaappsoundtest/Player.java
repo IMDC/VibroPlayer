@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import javaappsoundtest.AsioSoundHost;
+import javaappsoundtest.Server;
+import javaappsoundtest.SoundsFilter;
 import javax.sound.sampled.AudioFileFormat;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
@@ -314,8 +317,8 @@ public class Player extends javax.swing.JFrame {
         controlPanelBtn.addMouseListener(new java.awt.event.MouseAdapter() {
             @Override
             public void mouseClicked(java.awt.event.MouseEvent evt) {
-                ControlPanel controlPanel = new ControlPanel();
-                controlPanel.setVisible(true);
+                /*ControlPanel controlPanel = new ControlPanel();
+                controlPanel.setVisible(true);*/
             }
         });
 
@@ -870,6 +873,8 @@ public class Player extends javax.swing.JFrame {
             public void run() {
                 //new Player().setVisible(true);
                 Server server = new Server();
+                
+                System.out.println ( "asdasd" );
             }
         });
     }
