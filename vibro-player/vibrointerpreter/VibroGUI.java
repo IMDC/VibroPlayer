@@ -19,7 +19,7 @@ import javax.swing.JSlider;
 public class VibroGUI extends javax.swing.JFrame {
     
     private AsioDriver driver;
-    private AsioSoundHost listener;
+    protected AsioSoundHost listener;
     
     boolean fileFound = false;
     JFileChooser c = new JFileChooser();
@@ -41,6 +41,8 @@ public class VibroGUI extends javax.swing.JFrame {
         
         /* load the driver */
         driver = AsioDriver.getDriver ( "ASIO PreSonus FireStudio" );
+        listener = new AsioSoundHost ( driver );
+        driver.start();
         
         bars.clear();
         bars.add(visualBar1);

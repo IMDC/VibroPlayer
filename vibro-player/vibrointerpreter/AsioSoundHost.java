@@ -5,6 +5,7 @@ import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
 import com.synthbot.jasiohost.AsioDriverState;
+import java.util.HashSet;
 import java.util.Set;
 
 /*
@@ -19,10 +20,25 @@ import java.util.Set;
  */
 public class AsioSoundHost implements AsioDriverListener {
     
-    private AsioDriver asioDriver;
+    private AsioDriver driver;
+    private int bufferSize;
+    private double sampleRate;
+    private Set<AsioChannel> activeChannels;
     
-    public AsioSoundHost() {
-        
+    public AsioSoundHost ( AsioDriver driver ) {
+        if ( driver != null ) {
+            this.driver = driver;
+            this.driver.addAsioDriverListener ( this );
+            
+            this.bufferSize = this.driver.getBufferPreferredSize();
+            this.sampleRate = this.driver.getSampleRate();
+            
+            this.activeChannels = new HashSet<>();
+            for ( int i = 0; i < 8; i++ ) {
+                activeChannels.add ( this.driver.getChannelOutput ( i ) );
+            }
+            this.driver.createBuffers ( activeChannels );
+        }
     }
     
     public void bufferSwitch ( long systemTime, long samplePosition, Set<AsioChannel> channels ) {
@@ -46,7 +62,7 @@ public class AsioSoundHost implements AsioDriverListener {
             @Override
             public void run() {
                 System.out.println("resetRequest() callback received. Returning driver to INITIALIZED state.");
-                asioDriver.returnToState ( AsioDriverState.INITIALIZED );
+                driver.returnToState ( AsioDriverState.INITIALIZED );
             }
         }.start();
     }
@@ -57,5 +73,17 @@ public class AsioSoundHost implements AsioDriverListener {
     
     public void sampleRateDidChange(double sampleRate) {
         System.out.println("sampleRateDidChange() callback received.");
+    }
+    
+    public double getSampleRate() {
+        return this.sampleRate;
+    }
+    
+    public void output ( int channel, float[] output ) {
+        for ( AsioChannel channelInfo: this.activeChannels ) {
+            if ( channelInfo.getChannelIndex() == channel ) {
+                channelInfo.write ( output );
+            }
+        }
     }
 }

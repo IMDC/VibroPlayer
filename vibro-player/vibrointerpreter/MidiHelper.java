@@ -255,6 +255,45 @@ public class MidiHelper{
                         velocity*=(newVolumeAll/100)*(newVolume[outputNum]/100);
                         outputValues[0]=velocity;
                         outputValues[outputNum]=velocity;
+                        
+                        //generates a sin wave
+                        float[] sampleWave = new float[52];
+                        for ( int k = 0; k < 52; k++ ) {
+                            sampleWave[k] = (float) Math.sin ( velocity * Math.PI * k * 440.0 / GUI.listener.getSampleRate() );
+                        }
+                        
+                        //set the channel
+                        int channel = -1;
+                        
+                        if ( key >= 36 && key < 44 ) {
+                            channel = 0;
+                        }
+                        else if ( key >= 44 && key < 52 ) {
+                            channel = 1;
+                        }
+                        else if ( key >= 52 && key < 60 ) {
+                            channel = 2;
+                        }
+                        else if ( key >= 60 && key < 68 ) {
+                            channel = 3;
+                        }
+                        else if ( key >= 68 && key < 76 ) {
+                            channel = 4;
+                        }
+                        else if ( key >= 76 && key < 83 ) {
+                            channel = 5;
+                        }
+                        else if ( key >= 83 && key < 90 ) {
+                            channel = 6;
+                        }
+                        else if ( key >= 90 && key < 97 ) {
+                            channel = 7;
+                        }
+                        
+                        //outputs the sound
+                        GUI.listener.output ( channel, sampleWave );
+                        
+                        
                         channels[sm.getChannel()].noteOn( key, velocity );
                     } 
                     //when a key is released
