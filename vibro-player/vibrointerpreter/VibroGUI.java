@@ -20,6 +20,7 @@ public class VibroGUI extends javax.swing.JFrame {
     
     private AsioDriver driver;
     private AsioSoundHost listener;
+    //asdasd
     
     boolean fileFound = false;
     JFileChooser c = new JFileChooser();
