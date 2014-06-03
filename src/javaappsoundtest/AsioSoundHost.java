@@ -71,6 +71,7 @@ public class AsioSoundHost implements AsioDriverListener {
             /* Add all the 7 channels of the chair to a list and then to the driver */
                 activeChannels = new HashSet<>();
                 for ( int i = 0; i < 8; i++ ) {
+                    AsioChannel ac = this.driver.getChannelOutput ( i );
                     activeChannels.add ( this.driver.getChannelOutput ( i ) );
                 }
                 this.driver.createBuffers ( activeChannels );
