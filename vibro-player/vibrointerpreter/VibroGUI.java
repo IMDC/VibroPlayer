@@ -5,7 +5,9 @@ package vibrointerpreter;
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
+import com.synthbot.jasiohost.AsioDriver;
 import java.util.ArrayList;
+import java.util.List;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -15,6 +17,10 @@ import javax.swing.JSlider;
  * @author imdc
  */
 public class VibroGUI extends javax.swing.JFrame {
+    
+    private AsioDriver driver;
+    private AsioSoundHost listener;
+    
     boolean fileFound = false;
     JFileChooser c = new JFileChooser();
     int numChannels = 8;
@@ -32,6 +38,10 @@ public class VibroGUI extends javax.swing.JFrame {
     }
     
     public void setChannels(int num){
+        
+        /* load the driver */
+        driver = AsioDriver.getDriver ( "ASIO PreSonus FireStudio" );
+        
         bars.clear();
         bars.add(visualBar1);
         bars.add(visualBar2);
@@ -189,7 +199,6 @@ public class VibroGUI extends javax.swing.JFrame {
         jMenu1 = new javax.swing.JMenu();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(900, 513));
 
         jPanel1.setPreferredSize(new java.awt.Dimension(200, 100));
 
