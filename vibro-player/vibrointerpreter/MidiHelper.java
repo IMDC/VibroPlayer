@@ -7,6 +7,7 @@
 package vibrointerpreter;
 
 import java.io.File;
+import java.nio.BufferOverflowException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -19,7 +20,7 @@ import javax.sound.midi.*;
 public class MidiHelper{
     static float[] keyHertz = new float[127];
     static File file; 
-    static int tempo, currThread, numOutputs, MAX=17;
+    static int tempo, currThread, numOutputs, MAX=17, minKey=36, maxKey=96;
     static Sequence sequence;
     static boolean isPlaying =false;
     static VibroGUI GUI;
@@ -90,7 +91,7 @@ public class MidiHelper{
                             velocity*=(newVolumeAll/100)*(newVolume[outputNum]/100);
                             outputValues[0]=velocity;
                             outputValues[outputNum]=velocity;
-                            //play note
+                            //play note                       
                             channels[sm.getChannel()].noteOn( key, velocity );    
                         } 
                         //when the key if off
@@ -177,6 +178,30 @@ public class MidiHelper{
         }
     };
     
+    //Manage output to output device
+    static Runnable outputManager = new Runnable(){
+        public void run(){
+            int thisThread = currThread;
+            while(thisThread == currThread){ 
+                float[] sampleWave = new float[52];
+                try {
+                    for(int i=0; i<numOutputs; i++){
+                        for ( int k = 0; k < 52; k++ ) {
+                            sampleWave[k] = (float) Math.sin ( outputValues[i+1] * Math.PI * k * 440.0 / GUI.listener.getSampleRate() );
+                        }
+                        if (outputValues[i+1]!=0) GUI.listener.output ( i, sampleWave );
+                    }               
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(MidiHelper.class.getName()).log(Level.SEVERE, null, ex);
+                }
+                catch (BufferOverflowException e) {
+                    //Logger.getLogger(MidiHelper.class.getName()).log(Level.WARNING, null, e);
+                }
+            }
+        }
+    };
+        
     //Method to initiate midi device transmition     
     public void midiKeyboard(){
         MidiDevice device;
@@ -235,6 +260,11 @@ public class MidiHelper{
                     keyHertz[x] = (a / 32) * (2 ^ ((x - 9) / 12));
                 }
                 
+                if(GUI.outToDevice.isSelected()){
+                    Thread thread3 = new Thread(outputManager);
+                    thread3.start();
+                }
+                
                 if (msg instanceof ShortMessage){
                     ShortMessage sm = (ShortMessage) msg;
                     double newVolumeAll = GUI.volumeSlider.getValue();
@@ -245,7 +275,7 @@ public class MidiHelper{
                     //When a key is pressed
                     if (sm.getCommand() >= NOTE_ON_START && sm.getCommand() <= NOTE_ON_END) {
                         int key = sm.getData1();
-                        int outputNum =key/(127/numOutputs)+1;
+                        int outputNum =(key-minKey)/((maxKey-minKey)/numOutputs)+1;
                         int octave = (key / 12)-1;
                         int note = key % 12;
                         String noteName = NOTE_NAMES[note];
@@ -291,7 +321,7 @@ public class MidiHelper{
                         }
                         
                         //outputs the sound
-                        GUI.listener.output ( channel, sampleWave );
+                        //GUI.listener.output ( channel, sampleWave );
                         
                         
                         channels[sm.getChannel()].noteOn( key, velocity );
@@ -299,7 +329,7 @@ public class MidiHelper{
                     //when a key is released
                     else if (sm.getCommand() >= NOTE_OFF_START && sm.getCommand() <= NOTE_OFF_END) {
                         int key = sm.getData1();
-                        int outputNum =key/(127/numOutputs)+1;
+                        int outputNum =(key-minKey)/((maxKey-minKey)/numOutputs)+1;
                         int octave = (key / 12)-1;
                         int note = key % 12;
                         String noteName = NOTE_NAMES[note];
