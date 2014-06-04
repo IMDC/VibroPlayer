@@ -20,6 +20,8 @@ public class VibroGUI extends javax.swing.JFrame {
     private AsioDriver driver;
     protected AsioSoundHost listener;
     
+    protected boolean driverLoaded;
+    
     boolean fileFound = false;
     JFileChooser c = new JFileChooser();
     int numChannels = 8;
@@ -39,12 +41,14 @@ public class VibroGUI extends javax.swing.JFrame {
     public void setChannels(int num){
         
         /* load the driver */
-        try{
+        try {
             driver = AsioDriver.getDriver ( "ASIO PreSonus FireStudio" );
             listener = new AsioSoundHost ( driver );
             driver.start();
-        } catch(Exception e){
-            System.out.println("ASIO PreSonus FireStudio driver not found");
+            driverLoaded = true;
+        }
+        catch ( Exception e ) {
+            driverLoaded = false;
         }
         
         bars.clear();
