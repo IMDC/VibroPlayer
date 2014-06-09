@@ -6,7 +6,12 @@ package vibrointerpreter;
  * and open the template in the editor.
  */
 import com.synthbot.jasiohost.AsioDriver;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -34,8 +39,19 @@ public class VibroGUI extends javax.swing.JFrame {
      * Creates new form VibroGUI
      */
     public VibroGUI() {
-        initComponents();       
-        setChannels(numChannels);       
+        try {
+            initComponents();
+            setChannels(numChannels);
+            
+            WaveFileReader w = new WaveFileReader ( new File ( "rob_Track 1.wav" ) );
+            System.out.println ( w.getDuration() );
+            //w.read();
+        } catch (IOException ex) {
+            Logger.getLogger(VibroGUI.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (UnsupportedAudioFileException ex) {
+            Logger.getLogger(VibroGUI.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
     }
     
     public void setChannels(int num){
