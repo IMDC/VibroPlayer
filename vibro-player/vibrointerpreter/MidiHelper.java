@@ -260,9 +260,11 @@ public class MidiHelper{
                     keyHertz[x] = (a / 32) * (2 ^ ((x - 9) / 12));
                 }
                 
-                if(GUI.outToDevice.isSelected()){
-                    Thread thread3 = new Thread(outputManager);
+                if(GUI.outToDevice.isSelected() &&GUI.driverLoaded ){
+                    //activate output manager
+                    Thread thread3 = new Thread(outputManager);                   
                     thread3.start();
+                                        
                 }
                 
                 if (msg instanceof ShortMessage){
@@ -324,8 +326,7 @@ public class MidiHelper{
                             //outputs the sound
                             GUI.listener.output ( channel, sampleWave );
                         }
-                        //outputs the sound
-                        //GUI.listener.output ( channel, sampleWave );                                           
+                                                                
                         channels[sm.getChannel()].noteOn( key, velocity );
                     } 
                     //when a key is released
@@ -345,8 +346,7 @@ public class MidiHelper{
                 }
             } catch (MidiUnavailableException ex) {
                 Logger.getLogger(MidiHelper.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            
+            }           
         }
         public void close() {}       
     }
