@@ -79,6 +79,10 @@ public class AsioSoundHost implements AsioDriverListener {
         return this.sampleRate;
     }
     
+    public int getBufferSize() {
+        return this.bufferSize;
+    }
+    
     public void output ( int channel, float[] output ) {
         for ( AsioChannel channelInfo: this.activeChannels ) {
             if ( channelInfo.getChannelIndex() == channel ) {

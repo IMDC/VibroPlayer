@@ -183,10 +183,10 @@ public class MidiHelper{
         public void run(){
             int thisThread = currThread;
             while(thisThread == currThread){ 
-                float[] sampleWave = new float[52];
+                float[] sampleWave = new float[GUI.listener.getBufferSize()];
                 try {
                     for(int i=0; i<numOutputs; i++){
-                        for ( int k = 0; k < 52; k++ ) {
+                        for ( int k = 0; k < GUI.listener.getBufferSize(); k++ ) {
                             sampleWave[k] = (float) Math.sin ( outputValues[i+1] * Math.PI * k * 440.0 / GUI.listener.getSampleRate() );
                         }
                         if (outputValues[i+1]!=0) GUI.listener.output ( i, sampleWave );
@@ -280,7 +280,6 @@ public class MidiHelper{
                         int note = key % 12;
                         String noteName = NOTE_NAMES[note];
                         int velocity = sm.getData2();
-                        System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity + "  Hz:"+keyHertz[key]);
                         GUI.outText.setText("Note:"+noteName+" \tKey:"+key+" \tHertz:"+keyHertz[key]);
                         velocity*=(newVolumeAll/100)*(newVolume[outputNum]/100);
                         outputValues[0]=velocity;
@@ -288,8 +287,8 @@ public class MidiHelper{
                         
                         //generates a sin wave
                         if ( GUI.driverLoaded ) {
-                            float[] sampleWave = new float[20];
-                            for ( int k = 0; k < 20; k++ ) {
+                            float[] sampleWave = new float[GUI.listener.getBufferSize()];
+                            for ( int k = 0; k < GUI.listener.getBufferSize(); k++ ) {
                                 sampleWave[k] = (float) Math.sin ( Math.PI * k * 8000 / GUI.listener.getSampleRate() );
                             }
 
@@ -317,12 +316,14 @@ public class MidiHelper{
                             else if ( key >= 83 && key < 90 ) {
                                 channel = 6;
                             }
-                            else if ( key >= 90 && key < 97 ) {
+                            else if ( key >= 90 ) {
                                 channel = 7;
                             }
 
                             //outputs the sound
                             GUI.listener.output ( channel, sampleWave );
+                            
+                            System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity + "  Hz:"+keyHertz[key] + "  channel: " + channel);
                         }
                         //outputs the sound
                         //GUI.listener.output ( channel, sampleWave );                                           
