@@ -7,12 +7,19 @@
 package vibrointerpreter;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.BufferOverflowException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.midi.*;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.DataLine;
+import javax.sound.sampled.LineUnavailableException;
+import javax.sound.sampled.SourceDataLine;
 /**
  *
  * @author imdc
@@ -52,10 +59,9 @@ public class MidiHelper{
             sequence = MidiSystem.getSequence(file);
             
             //create key to hertz conversions.
-            int a = 440; // a is 440 hz...
             for (int x = 0; x < 127; ++x){
-               keyHertz[x] = (a / 32) * (2 ^ ((x - 9) / 12));
-            }
+                keyHertz[x] = (float) (440*(Math.pow(2,(x-69)/12.0)));
+            } 
             
             //Get each note, play the note, then set the respective output values 
             int trackNumber = 0;
@@ -138,7 +144,7 @@ public class MidiHelper{
         for(int i=1; i<numOutputs; i++){
             GUI.bars.get(i).setMaximum(127);
             GUI.bars.get(i).setMinimum(0);
-        }
+        }  
         MidiHelper.file = file; 
         MidiHelper.tempo = tempo;
         currThread++;
@@ -186,7 +192,7 @@ public class MidiHelper{
                 float[] sampleWave = new float[GUI.listener.getBufferSize()];
                 try {
                     for(int i=0; i<numOutputs; i++){
-                        for ( int k = 0; k < GUI.listener.getBufferSize(); k++ ) {
+                        for ( int k = 0; k < GUI.listener.getBufferSize()/2; k++ ) {
                             sampleWave[k] = (float) Math.sin ( outputValues[i+1] * Math.PI * k * 440.0 / GUI.listener.getSampleRate() );
                         }
                         if (outputValues[i+1]!=0) GUI.listener.output ( i, sampleWave );
@@ -197,10 +203,152 @@ public class MidiHelper{
                 }
                 catch (BufferOverflowException e) {
                     //Logger.getLogger(MidiHelper.class.getName()).log(Level.WARNING, null, e);
+                    System.out.println("Warning Buffer overload ;"+GUI.listener.getBufferSize()+"\n");
+                    try {
+                        //GUI.listener.bufferSizeChanged(2048);
+                        GUI.listener.wait(1000);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(MidiHelper.class.getName()).log(Level.SEVERE, null, ex);
+                    }
                 }
             }
         }
     };
+    
+    public int getOutputNum(int key){
+        if(numOutputs == 8){
+            if(keyHertz[key]==40){
+                return 1;
+            }
+            else if(keyHertz[key]==56){
+                return 2;
+            }
+            else if(keyHertz[key]==78.4){
+                return 3;
+            }
+            else if(keyHertz[key]==109.76){
+                return 4;
+            }
+            else if(keyHertz[key]==153.66){
+                return 5;
+            }
+            else if(keyHertz[key]==215.13){
+                return 6;
+            }
+            else if(keyHertz[key]==301.18){
+                return 7;
+            }
+            else if(keyHertz[key]==421.65){
+                return 8;
+            }
+        }
+        return (key-minKey)/((maxKey-minKey)/numOutputs)+1;
+    }
+    
+    public static void playWave(File file,String icon){
+        Runnable playSound = new Runnable(){
+            public void run(){
+                final int BUFFER_SIZE = 128000;
+                File soundFile = null;
+                AudioInputStream audioStream = null;
+                AudioFormat audioFormat;
+                SourceDataLine sourceLine = null;
+                Thread thread = new Thread(slideAdjuster);
+                thread.start();
+                Thread out = new Thread(outputManager);
+                out.start();
+                isPlaying=true;
+                
+                try {
+                    soundFile = file;
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                try {
+                    audioStream = AudioSystem.getAudioInputStream(soundFile);
+                } catch (Exception e){
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                audioFormat = audioStream.getFormat();
+                float sampleRate = audioFormat.getSampleRate();
+                int sampleSizeInBits = audioFormat.getSampleSizeInBits();
+                int channels = audioFormat.getChannels();
+                boolean signed = true;
+                boolean bigEndian = false;
+                audioFormat =  new AudioFormat(sampleRate, 
+                  sampleSizeInBits, channels, signed, bigEndian);
+
+                DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
+                
+                if ( !AudioSystem.isLineSupported ( info ) ) {
+                    // This is the PCM format we want to transcode to.
+                    // The parameters here are audio format details that you
+                    // shouldn't need to understand for casual use.
+                    AudioFormat pcm = new AudioFormat ( audioFormat.getSampleRate(), 16, audioFormat.getChannels(), true, false);
+
+                    // Get a wrapper stream around the input stream that does the
+                    // transcoding for us.
+                    audioStream = AudioSystem.getAudioInputStream ( pcm, audioStream );
+
+                    // Update the format and info variables for the transcoded data
+                    audioFormat = audioStream.getFormat();
+                    info = new DataLine.Info ( SourceDataLine.class, audioFormat );
+                }
+                
+                try {
+                    sourceLine = (SourceDataLine) AudioSystem.getLine(info);
+                    sourceLine.open(audioFormat);
+                } catch (LineUnavailableException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                }
+
+                sourceLine.start();
+
+                int nBytesRead = 0;
+                int numFramesRead = 0;
+                int bytesPerFrame = audioStream.getFormat().getFrameSize();
+                int totalFramesRead = 0;
+                byte[] abData = new byte[BUFFER_SIZE];
+                while (nBytesRead != -1) {
+                    try {
+                        nBytesRead = audioStream.read(abData, 0, abData.length);
+
+
+                        // Calculate the number of frames actually read.
+                        numFramesRead = nBytesRead / bytesPerFrame;
+                        totalFramesRead += numFramesRead;
+
+                        //visualiser
+                        String outTest="";
+                        for(int i=0; i<Math.abs(abData[numFramesRead]);i++){
+                            outputValues[1]= Math.abs(abData[numFramesRead]);
+                        }
+                        System.out.println(outTest+abData[numFramesRead]);
+
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (nBytesRead >= 0) {
+                        @SuppressWarnings("unused")
+                        int nBytesWritten = sourceLine.write(abData, 0, nBytesRead);
+                    }               
+                }
+                sourceLine.drain();
+                sourceLine.close();
+            }
+        };
+        Thread playS = new Thread(playSound);
+        playS.start();
+    }
         
     //Method to initiate midi device transmition     
     public void midiKeyboard(){
@@ -243,6 +391,9 @@ public class MidiHelper{
         public String name;
         public MidiInputReceiver(String name) {
             this.name = name;
+            for (int x = 0; x < 127; ++x){
+                keyHertz[x] = (float) (440*(Math.pow(2,(x-69)/12.0)));
+            }   
         }
         public void send(MidiMessage msg, long timeStamp) {    
             try {
@@ -254,17 +405,12 @@ public class MidiHelper{
                 int NOTE_ON_END = 0x9F;
                 int NOTE_OFF_START = 0x80;
                 int NOTE_OFF_END = 0x8F;
-                String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-                int a = 440; // a is 440 hz...
-                for (int x = 0; x < 127; ++x){
-                    keyHertz[x] = (a / 32) * (2 ^ ((x - 9) / 12));
-                }
+                String[] NOTE_NAMES = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};                         
                 
-                if(GUI.outToDevice.isSelected() &&GUI.driverLoaded ){
+                if(GUI.outToDevice.isSelected() && GUI.driverLoaded ){
                     //activate output manager
                     Thread thread3 = new Thread(outputManager);                   
-                    thread3.start();
-                                        
+                    thread3.start();                                       
                 }
                 
                 if (msg instanceof ShortMessage){
@@ -277,7 +423,7 @@ public class MidiHelper{
                     //When a key is pressed
                     if (sm.getCommand() >= NOTE_ON_START && sm.getCommand() <= NOTE_ON_END) {
                         int key = sm.getData1();
-                        int outputNum =(key-minKey)/((maxKey-minKey)/numOutputs)+1;
+                        int outputNum = getOutputNum(key);
                         int octave = (key / 12)-1;
                         int note = key % 12;
                         String noteName = NOTE_NAMES[note];
@@ -295,35 +441,10 @@ public class MidiHelper{
                             }
 
                             //set the channel
-                            int channel = -1;
-
-                            if ( key >= 36 && key < 44 ) {
-                                channel = 0;
-                            }
-                            else if ( key >= 44 && key < 52 ) {
-                                channel = 1;
-                            }
-                            else if ( key >= 52 && key < 60 ) {
-                                channel = 2;
-                            }
-                            else if ( key >= 60 && key < 68 ) {
-                                channel = 3;
-                            }
-                            else if ( key >= 68 && key < 76 ) {
-                                channel = 4;
-                            }
-                            else if ( key >= 76 && key < 83 ) {
-                                channel = 5;
-                            }
-                            else if ( key >= 83 && key < 90 ) {
-                                channel = 6;
-                            }
-                            else if ( key >= 90 ) {
-                                channel = 7;
-                            }
+                            int channel = getOutputNum(key);
 
                             //outputs the sound
-                            GUI.listener.output ( channel, sampleWave );
+                            //GUI.listener.output ( channel, sampleWave );
                             
                             System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity + "  Hz:"+keyHertz[key] + "  channel: " + channel);
                         }
@@ -333,7 +454,7 @@ public class MidiHelper{
                     //when a key is released
                     else if (sm.getCommand() >= NOTE_OFF_START && sm.getCommand() <= NOTE_OFF_END) {
                         int key = sm.getData1();
-                        int outputNum =(key-minKey)/((maxKey-minKey)/numOutputs)+1;
+                        int outputNum =getOutputNum(key);
                         int octave = (key / 12)-1;
                         int note = key % 12;
                         String noteName = NOTE_NAMES[note];

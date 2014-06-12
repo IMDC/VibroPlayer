@@ -83,6 +83,8 @@
                           <EmptySpace min="-2" max="-2" attributes="0"/>
                           <Component id="useFile" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
+                          <Component id="jRadioButton1" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="138" max="-2" attributes="0"/>
                           <Component id="outToDevice" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
@@ -106,6 +108,7 @@
                       <Component id="useFile" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="useDevice" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="outToDevice" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="jRadioButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -154,7 +157,6 @@
         </Component>
         <Component class="javax.swing.JRadioButton" name="useFile">
           <Properties>
-            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Input: MIDI File"/>
           </Properties>
           <Events>
@@ -177,6 +179,14 @@
           <AuxValues>
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="4"/>
           </AuxValues>
+        </Component>
+        <Component class="javax.swing.JRadioButton" name="jRadioButton1">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Input: Wave File"/>
+          </Properties>
+          <Events>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButton1ActionPerformed"/>
+          </Events>
         </Component>
       </SubComponents>
     </Container>

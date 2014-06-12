@@ -6,12 +6,7 @@ package vibrointerpreter;
  * and open the template in the editor.
  */
 import com.synthbot.jasiohost.AsioDriver;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -23,8 +18,7 @@ import javax.swing.JSlider;
 public class VibroGUI extends javax.swing.JFrame {
     
     private AsioDriver driver;
-    protected AsioSoundHost listener;
-    
+    protected AsioSoundHost listener;   
     protected boolean driverLoaded;
     
     boolean fileFound = false;
@@ -39,19 +33,8 @@ public class VibroGUI extends javax.swing.JFrame {
      * Creates new form VibroGUI
      */
     public VibroGUI() {
-        try {
-            initComponents();
-            setChannels(numChannels);
-            
-            WaveFileReader w = new WaveFileReader ( new File ( "rob_Track 1.wav" ) );
-            System.out.println ( w.getDuration() );
-            //w.read();
-        } catch (IOException ex) {
-            Logger.getLogger(VibroGUI.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (UnsupportedAudioFileException ex) {
-            Logger.getLogger(VibroGUI.class.getName()).log(Level.SEVERE, null, ex);
-        }
-        
+        initComponents();
+        setChannels(numChannels);    
     }
     
     public void setChannels(int num){
@@ -152,6 +135,7 @@ public class VibroGUI extends javax.swing.JFrame {
         useFile = new javax.swing.JRadioButton();
         useDevice = new javax.swing.JRadioButton();
         outToDevice = new javax.swing.JRadioButton();
+        jRadioButton1 = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         volumeSlider = new javax.swing.JSlider();
@@ -252,7 +236,6 @@ public class VibroGUI extends javax.swing.JFrame {
 
         outText.setText("Output");
 
-        useFile.setSelected(true);
         useFile.setText("Input: MIDI File");
         useFile.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -270,6 +253,13 @@ public class VibroGUI extends javax.swing.JFrame {
             }
         });
 
+        jRadioButton1.setText("Input: Wave File");
+        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jRadioButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -284,6 +274,8 @@ public class VibroGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(useFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jRadioButton1)
+                        .addGap(138, 138, 138)
                         .addComponent(outToDevice))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(101, 101, 101)
@@ -301,7 +293,8 @@ public class VibroGUI extends javax.swing.JFrame {
                     .addComponent(outText)
                     .addComponent(useFile)
                     .addComponent(useDevice)
-                    .addComponent(outToDevice))
+                    .addComponent(outToDevice)
+                    .addComponent(jRadioButton1))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
@@ -1153,6 +1146,18 @@ public class VibroGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_outToDeviceActionPerformed
 
+    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+        // TODO add your handling code here:
+        MidiHelper midiHelper = new MidiHelper(this);
+        int rVal = c.showOpenDialog(VibroGUI.this);
+        if (rVal == JFileChooser.APPROVE_OPTION) {
+            fileFound=true;
+             midiHelper.playWave(c.getSelectedFile(),"");
+             
+        }
+        
+    }//GEN-LAST:event_jRadioButton1ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -1234,6 +1239,7 @@ public class VibroGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
+    private javax.swing.JRadioButton jRadioButton1;
     protected javax.swing.JLabel outText;
     protected javax.swing.JRadioButton outToDevice;
     private javax.swing.JButton play;
