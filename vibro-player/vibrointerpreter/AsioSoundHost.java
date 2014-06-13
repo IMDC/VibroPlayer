@@ -5,6 +5,8 @@ import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
 import com.synthbot.jasiohost.AsioDriverState;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -25,6 +27,12 @@ public class AsioSoundHost implements AsioDriverListener {
     private double sampleRate;
     private Set<AsioChannel> activeChannels;
     
+    private WaveFileReader waveFile;
+    private boolean play = false;
+    private int currentSample;
+    
+    private float out[];
+    
     public AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
             this.driver = driver;
@@ -38,11 +46,41 @@ public class AsioSoundHost implements AsioDriverListener {
                 activeChannels.add ( this.driver.getChannelOutput ( i ) );
             }
             this.driver.createBuffers ( activeChannels );
+            
+            waveFile = null;
+            play = false;
+            currentSample = 0;
+            
+            out = new float[this.bufferSize];
         }
     }
     
     public void bufferSwitch ( long systemTime, long samplePosition, Set<AsioChannel> channels ) {
         
+        if ( play ) {
+            //should load the samples and play it
+            for ( int i = 0; i < this.bufferSize; i++, currentSample++ ) {
+                if ( currentSample < waveFile.getNumSamples() ) {
+                    float samplef = waveFile.getConvertedSampleAt ( currentSample );
+                    out[i] = samplef;
+                }
+                else {
+                    out[i] = 0.0f;
+                }
+            }
+
+            for ( AsioChannel channelInfo : channels ) {
+                if ( channelInfo.getChannelIndex() == 0 ) {
+                    channelInfo.write ( out );
+                }
+            }
+        }
+        
+    }
+    
+    public void playWaveFile ( WaveFileReader file ) {
+        play = true;
+        this.waveFile = file;
     }
     
     public void bufferSizeChanged(int bufferSize) {

@@ -245,7 +245,7 @@ public class MidiHelper{
         return (key-minKey)/((maxKey-minKey)/numOutputs)+1;
     }
     
-    public static void playWave(File file,String icon){
+    public static void playWave(final File file,String icon){
         Runnable playSound = new Runnable(){
             public void run(){
                 final int BUFFER_SIZE = 128000;

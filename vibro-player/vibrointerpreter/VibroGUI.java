@@ -6,7 +6,11 @@ package vibrointerpreter;
  * and open the template in the editor.
  */
 import com.synthbot.jasiohost.AsioDriver;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -29,6 +33,10 @@ public class VibroGUI extends javax.swing.JFrame {
     ArrayList <JProgressBar> bars = new ArrayList();
     ArrayList <JSlider> sliders = new ArrayList();
     ArrayList <JPanel> panels = new ArrayList();
+    
+    WaveFileReader waveFile;
+    protected boolean playFile = false;
+    
     /**
      * Creates new form VibroGUI
      */
@@ -1152,7 +1160,22 @@ public class VibroGUI extends javax.swing.JFrame {
         int rVal = c.showOpenDialog(VibroGUI.this);
         if (rVal == JFileChooser.APPROVE_OPTION) {
             fileFound=true;
-             midiHelper.playWave(c.getSelectedFile(),"");
+            try {
+                waveFile = new WaveFileReader ( c.getSelectedFile() );
+                waveFile.read();
+                waveFile.convert();
+                
+                this.playFile = true;
+                
+                //should play the samples loaded
+                listener.playWaveFile ( waveFile );
+                
+                //midiHelper.playWave(c.getSelectedFile(),"");
+            } catch (IOException ex) {
+                System.out.println ( ex );
+            } catch (UnsupportedAudioFileException ex) {
+                System.out.println ( ex );
+            }
              
         }
         
