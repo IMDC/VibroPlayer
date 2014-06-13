@@ -249,6 +249,7 @@ public class MidiHelper{
         thread.start();
         Thread out = new Thread(outputManager);
         out.start();
+        
         Runnable playSound = new Runnable(){
             public void run(){
                 final int BUFFER_SIZE = 128000;

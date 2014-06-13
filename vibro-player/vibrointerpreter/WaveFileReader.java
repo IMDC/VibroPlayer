@@ -35,6 +35,7 @@ public class WaveFileReader {
         private ArrayList<Byte> options;
         private String subChunk2ID;
         private int subchunk2Size;
+        private int numSamples;
         
         int aux;
     /* bytes of the header (header size) */
@@ -44,6 +45,7 @@ public class WaveFileReader {
     
     /* data */
     private ArrayList<byte[]> samples;
+    private ArrayList<Float> convertedSamples;
         
     private File file;
     //private AudioFormat audioFormat;
@@ -67,8 +69,10 @@ public class WaveFileReader {
         this.subchunk2Size = 0;
         this.headerSize = 0;
         this.frameSize = 0;
+        this.numSamples = 0;
         
         this.samples = new ArrayList<>();
+        this.convertedSamples = new ArrayList<>();
         
         if ( !getAudioFormat() ) {
             /* Is it possible to get where is the error?! */
@@ -219,6 +223,9 @@ public class WaveFileReader {
             }
             subchunk2Size = ByteBuffer.wrap ( bigSample ).order ( ByteOrder.LITTLE_ENDIAN ).getInt();
             
+        /* calculate the number of samples */
+            this.numSamples = ( 8 * subchunk2Size ) /  ( numChannels * bitsPerSample );
+        
         return true;
     }
     
@@ -238,40 +245,63 @@ public class WaveFileReader {
         return chunkSize / sampleRate / ( bitsPerSample / 8 ) / numChannels;
     }
     
+    public byte[] getSampleAt ( int at ) {
+        return this.samples.get ( at );
+    }
+    
+    public float getConvertedSampleAt ( int at ) {
+        return this.convertedSamples.get ( at );
+    }
+    
+    public int getNumSamples() {
+        return this.numSamples;
+    }
+    
     public void read() {
         try {
             //byte[] sample = new byte[audioFormat.getFrameSize()];
             int frameSize = this.getFrameSize();
-            byte[] sample = new byte[frameSize];
             
             FileInputStream inputStream = new FileInputStream ( this.file );
             
             /* Throw away header bytes */
                 for ( int i = 0; i < headerSize; i++ ) {
+                    byte[] sample = new byte[frameSize];
                     sample[0] = (byte) inputStream.read();
                 }
             
             int dataBytes = headerSize;
             
             /* get all the samples of the file */
-            for ( ; dataBytes < chunkSize; dataBytes++ ) {
+            for ( ; samples.size() < numSamples;  ) {
+                byte[] sample = new byte[frameSize];
                 /* group the samples in frames */
-                for ( int i = 0; i < frameSize; i++, dataBytes++ ) {
-                    sample[i] = (byte) inputStream.read();;
+                for ( int i = 0; i < frameSize; i++ ) {
+                    sample[i] = (byte) inputStream.read();
                 }
                 
                 samples.add ( sample );
                 
-                System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
+                //System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
                 
                 /*if ( Math.round ( dataBytes * 100 / chunkSize ) == 99 ) {
                     System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
                 }*/
             }
+            
+            System.out.println ( "Finished" );
         }
         catch ( IOException ex ) {
             System.out.println ( ex );
         }
     }
     
+    public void convert() {
+        for ( byte[] sample: samples ) {
+            float samplef = ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ).getFloat();
+            convertedSamples.add ( samplef );
+        }
+        
+        System.out.println ( "Samples converted to float." );
+    }
 }
