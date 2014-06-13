@@ -135,7 +135,7 @@ public class VibroGUI extends javax.swing.JFrame {
         useFile = new javax.swing.JRadioButton();
         useDevice = new javax.swing.JRadioButton();
         outToDevice = new javax.swing.JRadioButton();
-        jRadioButton1 = new javax.swing.JRadioButton();
+        useWave = new javax.swing.JRadioButton();
         jPanel2 = new javax.swing.JPanel();
         jPanel3 = new javax.swing.JPanel();
         volumeSlider = new javax.swing.JSlider();
@@ -253,10 +253,10 @@ public class VibroGUI extends javax.swing.JFrame {
             }
         });
 
-        jRadioButton1.setText("Input: Wave File");
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
+        useWave.setText("Input: Wave File");
+        useWave.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton1ActionPerformed(evt);
+                useWaveActionPerformed(evt);
             }
         });
 
@@ -274,8 +274,8 @@ public class VibroGUI extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(useFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jRadioButton1)
-                        .addGap(138, 138, 138)
+                        .addComponent(useWave)
+                        .addGap(188, 188, 188)
                         .addComponent(outToDevice))
                     .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGap(101, 101, 101)
@@ -294,7 +294,7 @@ public class VibroGUI extends javax.swing.JFrame {
                     .addComponent(useFile)
                     .addComponent(useDevice)
                     .addComponent(outToDevice)
-                    .addComponent(jRadioButton1))
+                    .addComponent(useWave))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jButton3)
@@ -1146,7 +1146,7 @@ public class VibroGUI extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_outToDeviceActionPerformed
 
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
+    private void useWaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useWaveActionPerformed
         // TODO add your handling code here:
         MidiHelper midiHelper = new MidiHelper(this);
         int rVal = c.showOpenDialog(VibroGUI.this);
@@ -1156,7 +1156,7 @@ public class VibroGUI extends javax.swing.JFrame {
              
         }
         
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
+    }//GEN-LAST:event_useWaveActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1239,12 +1239,12 @@ public class VibroGUI extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel7;
     private javax.swing.JPanel jPanel8;
     private javax.swing.JPanel jPanel9;
-    private javax.swing.JRadioButton jRadioButton1;
     protected javax.swing.JLabel outText;
     protected javax.swing.JRadioButton outToDevice;
     private javax.swing.JButton play;
     private javax.swing.JRadioButton useDevice;
     private javax.swing.JRadioButton useFile;
+    private javax.swing.JRadioButton useWave;
     public javax.swing.JProgressBar visualBar1;
     public javax.swing.JProgressBar visualBar10;
     public javax.swing.JProgressBar visualBar11;

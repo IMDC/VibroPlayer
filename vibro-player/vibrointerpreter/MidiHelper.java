@@ -87,7 +87,7 @@ public class MidiHelper{
                         if (sm.getCommand() >= NOTE_ON_START && sm.getCommand() <= NOTE_ON_END) {
                             //compute coresponding values
                             int key = sm.getData1();
-                            int outputNum =key/(127/numOutputs)+1;
+                            int outputNum = getOutputNum(key);
                             int octave = (key / 12)-1;
                             int note = key % 12;
                             String noteName = NOTE_NAMES[note];
@@ -104,7 +104,7 @@ public class MidiHelper{
                         else if (sm.getCommand() >= NOTE_OFF_START && sm.getCommand() <= NOTE_OFF_END) {
                             //compute coresponding values
                             int key = sm.getData1();
-                            int outputNum =key/(127/numOutputs)+1;
+                            int outputNum = getOutputNum(key);
                             int octave = (key / 12)-1;
                             int note = key % 12;
                             String noteName = NOTE_NAMES[note];
@@ -205,7 +205,6 @@ public class MidiHelper{
                     //Logger.getLogger(MidiHelper.class.getName()).log(Level.WARNING, null, e);
                     System.out.println("Warning Buffer overload ;"+GUI.listener.getBufferSize()+"\n");
                     try {
-                        //GUI.listener.bufferSizeChanged(2048);
                         GUI.listener.wait(1000);
                     } catch (InterruptedException ex) {
                         Logger.getLogger(MidiHelper.class.getName()).log(Level.SEVERE, null, ex);
@@ -215,64 +214,59 @@ public class MidiHelper{
         }
     };
     
-    public int getOutputNum(int key){
+    public static int getOutputNum(int key){
         if(numOutputs == 8){
-            if(keyHertz[key]==40){
-                return 1;
+            if(keyHertz[key]>1480 && keyHertz[key]<4186){
+                return 8;
             }
-            else if(keyHertz[key]==56){
-                return 2;
-            }
-            else if(keyHertz[key]==78.4){
-                return 3;
-            }
-            else if(keyHertz[key]==109.76){
-                return 4;
-            }
-            else if(keyHertz[key]==153.66){
-                return 5;
-            }
-            else if(keyHertz[key]==215.13){
-                return 6;
-            }
-            else if(keyHertz[key]==301.18){
+            if(keyHertz[key]>660 && keyHertz[key]<1480){
                 return 7;
             }
-            else if(keyHertz[key]==421.65){
-                return 8;
+            if(keyHertz[key]>467 && keyHertz[key]<660){
+                return 6;
+            }
+            if(keyHertz[key]>311 && keyHertz[key]<466){
+                return 5;
+            }
+            if(keyHertz[key]>220 && keyHertz[key]<311){
+                return 4;
+            }
+            if(keyHertz[key]>145 && keyHertz[key]<220){
+                return 3;
+            }
+            if(keyHertz[key]>69 && keyHertz[key]<145){
+                return 2;
+            }
+            if(keyHertz[key]>27.5 && keyHertz[key]<69){
+                return 1;
             }
         }
         return (key-minKey)/((maxKey-minKey)/numOutputs)+1;
     }
     
     public static void playWave(File file,String icon){
+        Thread thread = new Thread(slideAdjuster);
+        thread.start();
+        Thread out = new Thread(outputManager);
+        out.start();
         Runnable playSound = new Runnable(){
             public void run(){
                 final int BUFFER_SIZE = 128000;
                 File soundFile = null;
                 AudioInputStream audioStream = null;
                 AudioFormat audioFormat;
-                SourceDataLine sourceLine = null;
-                Thread thread = new Thread(slideAdjuster);
-                thread.start();
-                Thread out = new Thread(outputManager);
-                out.start();
+                SourceDataLine sourceLine = null;                
                 isPlaying=true;
                 
                 try {
                     soundFile = file;
+                    audioStream = AudioSystem.getAudioInputStream(soundFile);
                 } catch (Exception e) {
                     e.printStackTrace();
                     System.exit(1);
                 }
-
-                try {
-                    audioStream = AudioSystem.getAudioInputStream(soundFile);
-                } catch (Exception e){
-                    e.printStackTrace();
-                    System.exit(1);
-                }
-
+                
+                //Set audio format
                 audioFormat = audioStream.getFormat();
                 float sampleRate = audioFormat.getSampleRate();
                 int sampleSizeInBits = audioFormat.getSampleSizeInBits();
@@ -327,11 +321,7 @@ public class MidiHelper{
                         totalFramesRead += numFramesRead;
 
                         //visualiser
-                        String outTest="";
-                        for(int i=0; i<Math.abs(abData[numFramesRead]);i++){
-                            outputValues[1]= Math.abs(abData[numFramesRead]);
-                        }
-                        System.out.println(outTest+abData[numFramesRead]);
+                        outputValues[1]= Math.abs(abData[numFramesRead]);
 
 
                     } catch (IOException e) {
