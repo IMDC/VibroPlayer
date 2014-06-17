@@ -35,6 +35,7 @@ public class WaveFileReader {
         private ArrayList<Byte> options;
         private String subChunk2ID;
         private int subchunk2Size;
+        private int numSamples;
         
         int aux;
     /* bytes of the header (header size) */
@@ -67,6 +68,7 @@ public class WaveFileReader {
         this.subchunk2Size = 0;
         this.headerSize = 0;
         this.frameSize = 0;
+        this.numSamples = 0;
         
         this.samples = new ArrayList<>();
         
@@ -219,6 +221,9 @@ public class WaveFileReader {
             }
             subchunk2Size = ByteBuffer.wrap ( bigSample ).order ( ByteOrder.LITTLE_ENDIAN ).getInt();
             
+        /* get num samples */
+            numSamples = ( 8 * subchunk2Size ) / ( numChannels * bitsPerSample );
+            
         return true;
     }
     
@@ -243,7 +248,8 @@ public class WaveFileReader {
     }
     
     public int getNumSamples() {
-        return this.numSamples;
+        //return this.numSamples;
+        return 0;
     }
     
     public void read() {
@@ -264,7 +270,7 @@ public class WaveFileReader {
             System.out.println ( "Reading the file" );
             
             /* get all the samples of the file */
-            for ( ; dataBytes < chunkSize; dataBytes++ ) {
+            for ( ; samples.size() < numSamples; ) {
                 /* group the samples in frames */
                 for ( int i = 0; i < frameSize; i++, dataBytes++ ) {
                     sample[i] = (byte) inputStream.read();
@@ -278,6 +284,7 @@ public class WaveFileReader {
                     System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
                 }
             }
+            System.out.println ( "Finished" );
         }
         catch ( IOException ex ) {
             System.out.println ( ex );
