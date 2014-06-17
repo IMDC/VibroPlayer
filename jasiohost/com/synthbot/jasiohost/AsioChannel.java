@@ -22,6 +22,8 @@ package com.synthbot.jasiohost;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
 
 /**
  * The <code>AsioChannel</code> class represents an input or output channel available form the
@@ -203,6 +205,19 @@ public class AsioChannel {
         throw new IllegalStateException(
             "The sample types ASIOSTDSDInt8MSB1, ASIOSTDSDInt8LSB1, and ASIOSTDSDInt8NER8 are not supported.");
       }
+    }
+  }
+  public void write ( ByteBuffer[] output) {
+    if (isInput) {
+      throw new IllegalStateException("Only output channels can be written to.");
+    }
+    if (!isActive) {
+      throw new IllegalStateException("This channel is not active: " + toString());
+    }
+    ByteBuffer outputBuffer = getByteBuffer();
+    for ( ByteBuffer sampleValue: output ) {
+        float val = sampleValue.getFloat();
+        outputBuffer.putInt ( ( int ) ( val * MAX_INT32 ) );
     }
   }
   
