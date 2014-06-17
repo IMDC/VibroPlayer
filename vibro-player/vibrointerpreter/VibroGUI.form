@@ -81,10 +81,10 @@
                           <EmptySpace type="separate" max="-2" attributes="0"/>
                           <Component id="useDevice" max="32767" attributes="0"/>
                           <EmptySpace min="-2" max="-2" attributes="0"/>
-                          <Component id="useFile" max="32767" attributes="0"/>
+                          <Component id="useMIDIFile" max="32767" attributes="0"/>
                           <EmptySpace max="-2" attributes="0"/>
-                          <Component id="jRadioButton1" min="-2" max="-2" attributes="0"/>
-                          <EmptySpace min="-2" pref="138" max="-2" attributes="0"/>
+                          <Component id="useWaveFile" min="-2" max="-2" attributes="0"/>
+                          <EmptySpace min="-2" pref="188" max="-2" attributes="0"/>
                           <Component id="outToDevice" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <Group type="102" attributes="0">
@@ -105,10 +105,10 @@
               <Group type="102" alignment="0" attributes="0">
                   <Group type="103" groupAlignment="3" attributes="0">
                       <Component id="outText" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="useFile" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="useMIDIFile" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="useDevice" alignment="3" min="-2" max="-2" attributes="0"/>
                       <Component id="outToDevice" alignment="3" min="-2" max="-2" attributes="0"/>
-                      <Component id="jRadioButton1" alignment="3" min="-2" max="-2" attributes="0"/>
+                      <Component id="useWaveFile" alignment="3" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="3" attributes="0">
@@ -155,12 +155,12 @@
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="4"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="useFile">
+        <Component class="javax.swing.JRadioButton" name="useMIDIFile">
           <Properties>
             <Property name="text" type="java.lang.String" value="Input: MIDI File"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="useFileActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="useMIDIFileActionPerformed"/>
           </Events>
         </Component>
         <Component class="javax.swing.JRadioButton" name="useDevice">
@@ -180,12 +180,12 @@
             <AuxValue name="JavaCodeGenerator_VariableModifier" type="java.lang.Integer" value="4"/>
           </AuxValues>
         </Component>
-        <Component class="javax.swing.JRadioButton" name="jRadioButton1">
+        <Component class="javax.swing.JRadioButton" name="useWaveFile">
           <Properties>
             <Property name="text" type="java.lang.String" value="Input: Wave File"/>
           </Properties>
           <Events>
-            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jRadioButton1ActionPerformed"/>
+            <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="useWaveFileActionPerformed"/>
           </Events>
         </Component>
       </SubComponents>

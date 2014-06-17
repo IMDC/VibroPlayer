@@ -6,7 +6,6 @@ import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
 import com.synthbot.jasiohost.AsioDriverState;
 import java.nio.ByteBuffer;
-import java.nio.ByteOrder;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -58,7 +57,6 @@ public class AsioSoundHost implements AsioDriverListener {
     }
     
     public void bufferSwitch ( long systemTime, long samplePosition, Set<AsioChannel> channels ) {
-        
         if ( play ) {
             //should load the samples and play it
             for ( int i = 0; i < this.bufferSize; i++, currentSample++ ) {
