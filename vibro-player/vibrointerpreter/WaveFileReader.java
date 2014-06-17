@@ -44,8 +44,7 @@ public class WaveFileReader {
     private int frameSize;
     
     /* data */
-    private ArrayList<byte[]> samples;
-    private ArrayList<Float> convertedSamples;
+    private ArrayList<ByteBuffer> samples;
         
     private File file;
     //private AudioFormat audioFormat;
@@ -72,7 +71,6 @@ public class WaveFileReader {
         this.numSamples = 0;
         
         this.samples = new ArrayList<>();
-        this.convertedSamples = new ArrayList<>();
         
         if ( !getAudioFormat() ) {
             /* Is it possible to get where is the error?! */
@@ -237,7 +235,7 @@ public class WaveFileReader {
         return this.numChannels;
     }
     
-    public ArrayList<byte[]> getSamples() {
+    public ArrayList<ByteBuffer> getSamples() {
         return this.samples;
     }
     
@@ -245,12 +243,8 @@ public class WaveFileReader {
         return chunkSize / sampleRate / ( bitsPerSample / 8 ) / numChannels;
     }
     
-    public byte[] getSampleAt ( int at ) {
+    public ByteBuffer getSampleAt ( int at ) {
         return this.samples.get ( at );
-    }
-    
-    public float getConvertedSampleAt ( int at ) {
-        return this.convertedSamples.get ( at );
     }
     
     public int getNumSamples() {
@@ -272,21 +266,23 @@ public class WaveFileReader {
             
             int dataBytes = headerSize;
             
+            System.out.println ( "Reading the file" );
+            
             /* get all the samples of the file */
             for ( ; samples.size() < numSamples;  ) {
                 byte[] sample = new byte[frameSize];
                 /* group the samples in frames */
-                for ( int i = 0; i < frameSize; i++ ) {
+                for ( int i = 0; i < frameSize; i++, dataBytes++ ) {
                     sample[i] = (byte) inputStream.read();
                 }
                 
-                samples.add ( sample );
+                samples.add ( ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ) );
                 
                 //System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
                 
-                /*if ( Math.round ( dataBytes * 100 / chunkSize ) == 99 ) {
+                if ( Math.round ( dataBytes * 100 / chunkSize ) == 99 ) {
                     System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
-                }*/
+                }
             }
             
             System.out.println ( "Finished" );
@@ -294,14 +290,5 @@ public class WaveFileReader {
         catch ( IOException ex ) {
             System.out.println ( ex );
         }
-    }
-    
-    public void convert() {
-        for ( byte[] sample: samples ) {
-            float samplef = ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ).getFloat();
-            convertedSamples.add ( samplef );
-        }
-        
-        System.out.println ( "Samples converted to float." );
     }
 }

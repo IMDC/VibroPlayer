@@ -32,6 +32,7 @@ public class AsioSoundHost implements AsioDriverListener {
     private int currentSample;
     
     private float out[];
+    private ByteBuffer byteBufferOut[];
     
     public AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
@@ -52,6 +53,7 @@ public class AsioSoundHost implements AsioDriverListener {
             currentSample = 0;
             
             out = new float[this.bufferSize];
+            byteBufferOut = new ByteBuffer[this.bufferSize];
         }
     }
     
@@ -61,17 +63,17 @@ public class AsioSoundHost implements AsioDriverListener {
             //should load the samples and play it
             for ( int i = 0; i < this.bufferSize; i++, currentSample++ ) {
                 if ( currentSample < waveFile.getNumSamples() ) {
-                    float samplef = waveFile.getConvertedSampleAt ( currentSample );
-                    out[i] = samplef;
+                    ByteBuffer samples = waveFile.getSampleAt ( currentSample );
+                    byteBufferOut[i] = samples;
                 }
                 else {
-                    out[i] = 0.0f;
+                    byteBufferOut[i] = null;
                 }
             }
 
             for ( AsioChannel channelInfo : channels ) {
                 if ( channelInfo.getChannelIndex() == 0 ) {
-                    channelInfo.write ( out );
+                    channelInfo.write ( byteBufferOut );
                 }
             }
         }

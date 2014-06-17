@@ -1163,7 +1163,6 @@ public class VibroGUI extends javax.swing.JFrame {
             try {
                 waveFile = new WaveFileReader ( c.getSelectedFile() );
                 waveFile.read();
-                waveFile.convert();
                 
                 this.playFile = true;
                 
