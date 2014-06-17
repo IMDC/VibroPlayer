@@ -15,6 +15,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -157,7 +158,11 @@ public class ServerConfig extends javax.swing.JFrame {
             writer.write ( "Port;" + integerPort );
             writer.close();
             
-            System.out.println ( "File saved." );
+            ServerGUI.log.append ( "Server configured to listen port " + port.getText() + "\n" );
+            
+            JOptionPane.showMessageDialog ( null, "Configuration saved.", "Configuration saved", JOptionPane.INFORMATION_MESSAGE );
+            
+            this.dispose();
         }
         catch ( FileNotFoundException ex ) {
             System.out.println ( ex );
