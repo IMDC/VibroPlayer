@@ -223,6 +223,8 @@ public class WaveFileReader {
             
         /* get num samples */
             numSamples = ( 8 * subchunk2Size ) / ( numChannels * bitsPerSample );
+        
+        inputStream.close();
             
         return true;
     }
@@ -284,6 +286,8 @@ public class WaveFileReader {
                     System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
                 }
             }
+            
+            inputStream.close();
             System.out.println ( "Finished" );
         }
         catch ( IOException ex ) {

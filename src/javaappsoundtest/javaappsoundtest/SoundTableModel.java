@@ -16,6 +16,9 @@ import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.Writer;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.table.AbstractTableModel;
@@ -66,6 +69,20 @@ public class SoundTableModel extends AbstractTableModel {
     
     public void addRow ( Sound s ) {
         datalist.add ( s );
+        this.fireTableDataChanged();
+        updateFile();
+    }
+    
+    public void removeRow ( int row ) {
+        try {
+            Path path =  Paths.get ( datalist.get ( row ).getFilePath() );
+            datalist.remove ( row );
+            Files.delete ( path );
+            ServerGUI.log.append ( ServerGUI.getCurrentTime() + " File deleted." );
+        } catch ( IOException ex ) {
+            System.out.println ( ex );
+        }
+        
         this.fireTableDataChanged();
         updateFile();
     }

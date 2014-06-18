@@ -119,6 +119,11 @@ public class CommandsConfig extends javax.swing.JFrame {
         });
 
         jButton2.setText("Delete");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -233,6 +238,19 @@ public class CommandsConfig extends javax.swing.JFrame {
             JOptionPane.showMessageDialog ( null, "Please fill in \"Command\" and choose a \"Wave File\".", "Need more information", JOptionPane.INFORMATION_MESSAGE );
         }
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        
+        if ( soundTable.getSelectedRow() != -1 ) {
+            int dialogButton = JOptionPane.YES_NO_OPTION;
+            int dialogResult = JOptionPane.showConfirmDialog ( null, "Would you like to delete the selected command?", "Warning", dialogButton );
+            
+            if ( dialogResult == JOptionPane.YES_OPTION ) {
+                sounds.removeRow ( soundTable.getSelectedRow() );
+            }
+        }
+        
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     private void resetForm() {
         insertFile.setText ( null );
