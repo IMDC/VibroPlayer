@@ -6,19 +6,39 @@
 
 package javaappsoundtest;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.FileAlreadyExistsException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author imdc
  */
 public class CommandsConfig extends javax.swing.JFrame {
 
+    private File chosenFile;
+    
     /**
      * Creates new form CommandsConfig
      */
     public CommandsConfig() {
+        chosenFile = null;
+        
         initComponents();
         
         insertCommand.setDocument ( new FixedLengthDocument ( 10 ) );
+        
+        /* check if the file already exists */
+        File destination = new File ( ServerGUI.getSoundsPath() );
+        
+        if ( !destination.exists() ) {
+            destination.mkdir();
+        }
     }
 
     /**
@@ -70,12 +90,27 @@ public class CommandsConfig extends javax.swing.JFrame {
         jLabel2.setText("Wave File:");
 
         insertFile.setEditable(false);
+        insertFile.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                insertFileMouseClicked(evt);
+            }
+        });
+        insertFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                insertFileActionPerformed(evt);
+            }
+        });
 
         jLabel3.setText("Chair Pattern:");
 
         jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Top 4", "Bottom 4", "All" }));
 
         jButton1.setText("Insert");
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jButton2.setText("Delete");
 
@@ -114,11 +149,12 @@ public class CommandsConfig extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jButton2)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 45, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel1)
-                    .addComponent(jLabel2)
-                    .addComponent(insertFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(insertCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(insertCommand, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jLabel1)
+                        .addComponent(jLabel2)
+                        .addComponent(insertFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
@@ -131,6 +167,43 @@ public class CommandsConfig extends javax.swing.JFrame {
         setSize(new java.awt.Dimension(542, 472));
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void insertFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_insertFileActionPerformed
+        
+    }//GEN-LAST:event_insertFileActionPerformed
+
+    private void insertFileMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_insertFileMouseClicked
+        
+        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter ( new SoundsFilter() );
+        int returnVal = fc.showOpenDialog ( this );
+
+        if ( returnVal == JFileChooser.APPROVE_OPTION ) {
+            chosenFile = fc.getSelectedFile();
+            insertFile.setText ( chosenFile.getAbsolutePath() );
+        }
+        
+    }//GEN-LAST:event_insertFileMouseClicked
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        /* validates the form */
+        if ( !insertFile.getText().isEmpty() && !insertCommand.getText().isEmpty() ) {
+            Path destinationPath = Paths.get ( ServerGUI.getSoundsPath() + chosenFile.getName() );
+            Path sourcePath = Paths.get ( chosenFile.getAbsolutePath() );
+
+            try {
+                Files.copy ( sourcePath, destinationPath );
+            } catch ( FileAlreadyExistsException ex ) {
+                insertFile.setText ( null );
+                JOptionPane.showMessageDialog ( null, "A file with the same name already exists. Please rename the file.", "File already exists", JOptionPane.INFORMATION_MESSAGE );
+            } catch (IOException ex) {
+                ServerGUI.log.append ( "Cannot copy the wave file: " + ex );
+            }
+        }
+        else {
+            JOptionPane.showMessageDialog ( null, "Please fill in \"Command\" and choose a \"Wave File\".", "Need more information", JOptionPane.INFORMATION_MESSAGE );
+        }
+    }//GEN-LAST:event_jButton1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField insertCommand;
