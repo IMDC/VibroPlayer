@@ -219,8 +219,6 @@ public class CommandsConfig extends javax.swing.JFrame {
                 
                 resetForm();
                 
-                updateTable();
-                
                 JOptionPane.showMessageDialog ( null, "Command saved.", "Command saved", JOptionPane.INFORMATION_MESSAGE );
             } catch ( FileAlreadyExistsException ex ) {
                 insertFile.setText ( null );
@@ -240,12 +238,6 @@ public class CommandsConfig extends javax.swing.JFrame {
         insertFile.setText ( null );
         insertPattern.setSelectedIndex ( 0 );
         insertCommand.setText ( null );
-    }
-    
-    private void updateTable() {
-        soundTable.removeAll();
-
-        //soundTable.setModel ( new SoundTableModel ( sounds.getSounds() ) );
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
