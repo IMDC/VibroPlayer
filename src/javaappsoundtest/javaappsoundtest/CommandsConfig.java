@@ -12,9 +12,6 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -26,12 +23,12 @@ import javax.swing.JOptionPane;
 public class CommandsConfig extends javax.swing.JFrame {
 
     private File chosenFile;
-    static CommandsHandler sounds;
+    static SoundTableModel sounds;
     
     /**
      * Creates new form CommandsConfig
      */
-    public CommandsConfig ( CommandsHandler sounds ) {
+    public CommandsConfig ( SoundTableModel sounds ) {
         this.sounds = sounds;
         
         chosenFile = null;
@@ -46,6 +43,8 @@ public class CommandsConfig extends javax.swing.JFrame {
         if ( !destination.exists() ) {
             destination.mkdir();
         }
+        
+        soundTable.setModel ( sounds );
     }
 
     /**
@@ -58,7 +57,7 @@ public class CommandsConfig extends javax.swing.JFrame {
     private void initComponents() {
 
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        soundTable = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         insertCommand = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
@@ -70,7 +69,7 @@ public class CommandsConfig extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        soundTable.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -86,10 +85,10 @@ public class CommandsConfig extends javax.swing.JFrame {
                 return canEdit [columnIndex];
             }
         });
-        jScrollPane1.setViewportView(jTable1);
-        if (jTable1.getColumnModel().getColumnCount() > 0) {
-            jTable1.getColumnModel().getColumn(1).setResizable(false);
-            jTable1.getColumnModel().getColumn(1).setPreferredWidth(80);
+        jScrollPane1.setViewportView(soundTable);
+        if (soundTable.getColumnModel().getColumnCount() > 0) {
+            soundTable.getColumnModel().getColumn(1).setResizable(false);
+            soundTable.getColumnModel().getColumn(1).setPreferredWidth(80);
         }
 
         jLabel1.setText("Command:");
@@ -215,9 +214,12 @@ public class CommandsConfig extends javax.swing.JFrame {
                 
                 Files.copy ( sourcePath, destinationPath );
                 
-                sounds.addSound ( new Sound ( insertCommand.getText(), ChairPattern.TOP4, destinationPath.toAbsolutePath().toString() ) );
+                
+                sounds.addRow ( new Sound ( insertCommand.getText(), pattern, destinationPath.toAbsolutePath().toString() ) );
                 
                 resetForm();
+                
+                updateTable();
                 
                 JOptionPane.showMessageDialog ( null, "Command saved.", "Command saved", JOptionPane.INFORMATION_MESSAGE );
             } catch ( FileAlreadyExistsException ex ) {
@@ -226,7 +228,7 @@ public class CommandsConfig extends javax.swing.JFrame {
             } catch (IOException ex) {
                 ServerGUI.log.append ( "Cannot copy the wave file: " + ex );
             } catch (UnsupportedAudioFileException ex) {
-                System.out.println ( ex );
+                ServerGUI.log.append ( "Cannot copy the wave file: " + ex );
             }
         }
         else {
@@ -240,6 +242,12 @@ public class CommandsConfig extends javax.swing.JFrame {
         insertCommand.setText ( null );
     }
     
+    private void updateTable() {
+        soundTable.removeAll();
+
+        //soundTable.setModel ( new SoundTableModel ( sounds.getSounds() ) );
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField insertCommand;
     private javax.swing.JTextField insertFile;
@@ -250,6 +258,6 @@ public class CommandsConfig extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JTable jTable1;
+    private javax.swing.JTable soundTable;
     // End of variables declaration//GEN-END:variables
 }

@@ -29,6 +29,27 @@ public class Sound {
         this.waveFile = new WaveFileReader ( new File ( filePath ) );
     }
     
+    public Sound() {
+        
+    }
+    
+    public void setFile ( String path ) throws IOException, UnsupportedAudioFileException {
+        this.filePath = path;
+        this.waveFile = new WaveFileReader ( new File ( filePath ) );
+    }
+    
+    public void setChairPattern ( String pattern ) {
+        if ( pattern.equals ( "TOP4" ) ) {
+            this.pattern = ChairPattern.TOP4;
+        }
+        else if ( pattern.equals ( "BOTTOM4" ) ) {
+            this.pattern = ChairPattern.BOTTOM4;
+        }
+        else if ( pattern.equals ( "ALL" ) ) {
+            this.pattern = ChairPattern.ALL;
+        }
+    }
+    
     public String getCommand() {
         return this.command;
     }
