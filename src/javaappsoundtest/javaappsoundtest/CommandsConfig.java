@@ -12,6 +12,10 @@ import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 
@@ -22,11 +26,14 @@ import javax.swing.JOptionPane;
 public class CommandsConfig extends javax.swing.JFrame {
 
     private File chosenFile;
+    static CommandsHandler sounds;
     
     /**
      * Creates new form CommandsConfig
      */
-    public CommandsConfig() {
+    public CommandsConfig ( CommandsHandler sounds ) {
+        this.sounds = sounds;
+        
         chosenFile = null;
         
         initComponents();
@@ -57,7 +64,7 @@ public class CommandsConfig extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         insertFile = new javax.swing.JTextField();
         jLabel3 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
+        insertPattern = new javax.swing.JComboBox();
         jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
 
@@ -103,7 +110,7 @@ public class CommandsConfig extends javax.swing.JFrame {
 
         jLabel3.setText("Chair Pattern:");
 
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Top 4", "Bottom 4", "All" }));
+        insertPattern.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "Top 4", "Bottom 4", "All" }));
 
         jButton1.setText("Insert");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -125,7 +132,7 @@ public class CommandsConfig extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(insertPattern, javax.swing.GroupLayout.PREFERRED_SIZE, 137, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
@@ -158,7 +165,7 @@ public class CommandsConfig extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel3)
-                    .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(insertPattern, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addComponent(jButton1)
                 .addGap(19, 19, 19))
@@ -191,13 +198,35 @@ public class CommandsConfig extends javax.swing.JFrame {
             Path destinationPath = Paths.get ( ServerGUI.getSoundsPath() + chosenFile.getName() );
             Path sourcePath = Paths.get ( chosenFile.getAbsolutePath() );
 
+            ChairPattern pattern = null;
+            String selectedItem = insertPattern.getSelectedItem().toString();
+            
+            if ( selectedItem.equals ( "All" ) ) {
+                pattern = ChairPattern.ALL;
+            }
+            else if ( selectedItem.equals ( "Top 4" ) ) {
+                pattern = ChairPattern.TOP4;
+            }
+            else if ( selectedItem.equals ( "Bottom 4" ) ) {
+                pattern = ChairPattern.BOTTOM4;
+            }
+            
             try {
+                
                 Files.copy ( sourcePath, destinationPath );
+                
+                sounds.addSound ( new Sound ( insertCommand.getText(), ChairPattern.TOP4, destinationPath.toAbsolutePath().toString() ) );
+                
+                resetForm();
+                
+                JOptionPane.showMessageDialog ( null, "Command saved.", "Command saved", JOptionPane.INFORMATION_MESSAGE );
             } catch ( FileAlreadyExistsException ex ) {
                 insertFile.setText ( null );
                 JOptionPane.showMessageDialog ( null, "A file with the same name already exists. Please rename the file.", "File already exists", JOptionPane.INFORMATION_MESSAGE );
             } catch (IOException ex) {
                 ServerGUI.log.append ( "Cannot copy the wave file: " + ex );
+            } catch (UnsupportedAudioFileException ex) {
+                System.out.println ( ex );
             }
         }
         else {
@@ -205,12 +234,18 @@ public class CommandsConfig extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jButton1ActionPerformed
 
+    private void resetForm() {
+        insertFile.setText ( null );
+        insertPattern.setSelectedIndex ( 0 );
+        insertCommand.setText ( null );
+    }
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JTextField insertCommand;
     private javax.swing.JTextField insertFile;
+    private javax.swing.JComboBox insertPattern;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
