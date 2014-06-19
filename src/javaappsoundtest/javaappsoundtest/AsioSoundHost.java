@@ -139,14 +139,14 @@ public class AsioSoundHost implements AsioDriverListener {
             }
             
             for( int i = 0; i < output.length ; i++, currentCounter++) {
-                Music m = ServerGUI.getMusicByName ( musicToPlay );
+                /*Music m = ServerGUI.getMusicByName ( musicToPlay );
                 
                 //this is to repeat the sound
                 if ( currentCounter >= m.getMaxCount() - 1500 ) {
                     this.restart();
                 }
 
-                output[i] = m.getFloat ( currentCounter );
+                output[i] = m.getFloat ( currentCounter );*/
             }
 
         /* Runs all the channel in the active list */

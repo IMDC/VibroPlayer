@@ -143,4 +143,10 @@ public class SoundTableModel extends AbstractTableModel {
         }
         return null;
     }
+    
+    public void readFiles() {
+        for ( int i = 0; i < datalist.size(); i++ ) {
+            datalist.get ( i ).read();
+        }
+    }
 }
