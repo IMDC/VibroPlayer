@@ -8,10 +8,13 @@ package javaappsoundtest;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
@@ -254,34 +257,40 @@ public class WaveFileReader {
         return 0;
     }
     
-    public void read() {
+    public void read() throws Exception {
+        //byte[] sample = new byte[audioFormat.getFrameSize()];
+        int frameSize = this.getFrameSize();
+        byte[] sample = new byte[frameSize];
+
+        if ( frameSize != 4 ) {
+            throw new Exception ( "The file \"" + file.getName() + "\" is not a 32 bits file. Please follow the instructions in \"Help\"" );
+        }
+        if ( numChannels != 1 ) {
+            throw new Exception ( "The file \"" + file.getName() + "\" does not have only one channel. Please follow the instructions in \"Help\"" );
+        }
+        
+        FileInputStream inputStream;
         try {
-            //byte[] sample = new byte[audioFormat.getFrameSize()];
-            int frameSize = this.getFrameSize();
-            byte[] sample = new byte[frameSize];
-            
-            FileInputStream inputStream = new FileInputStream ( this.file );
-            
+            inputStream = new FileInputStream ( this.file );
+
             /* Throw away header bytes */
                 for ( int i = 0; i < headerSize; i++ ) {
                     sample[0] = (byte) inputStream.read();
                 }
-            
+
             int dataBytes = headerSize;
-            
-            System.out.println ( "Reading the file" );
-            
+
             /* get all the samples of the file */
             for ( ; samples.size() < numSamples; ) {
                 /* group the samples in frames */
                 for ( int i = 0; i < frameSize; i++, dataBytes++ ) {
                     sample[i] = (byte) inputStream.read();
                 }
-                
+
                 samples.add ( ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ) );
-                
+
                 System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
-                
+
                 if ( Math.round ( dataBytes * 100 / chunkSize ) == 99 ) {
                     System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
                 }
@@ -289,9 +298,11 @@ public class WaveFileReader {
             
             inputStream.close();
             System.out.println ( "Finished" );
-        }
-        catch ( IOException ex ) {
-            System.out.println ( ex );
+        
+        } catch ( FileNotFoundException ex ) {
+            throw new Exception ( "Problem with \"" + file.getName() + "\" file. Make sure to follow the instructions described in \"Help\"" );
+        } catch ( IOException ex ) {
+            throw new Exception ( "Problem with \"" + file.getName() + "\" file. Make sure to follow the instructions described in \"Help\"" );
         }
     }
 }

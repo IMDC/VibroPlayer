@@ -144,9 +144,14 @@ public class SoundTableModel extends AbstractTableModel {
         return null;
     }
     
-    public void readFiles() {
+    public void readFiles() throws Exception {
+        //should put it into a thread
+        ServerGUI.log.append ( ServerGUI.getCurrentTime() + "Starting to read the wave files..." );
+        
         for ( int i = 0; i < datalist.size(); i++ ) {
+            ServerGUI.log.append ( ServerGUI.getCurrentTime() + "Reading the file for " + datalist.get ( i ).getCommand() + " command\n" );
             datalist.get ( i ).read();
+            ServerGUI.log.append ( ServerGUI.getCurrentTime() + datalist.get ( i ).getCommand() + " successfully read.\n" );
         }
     }
 }

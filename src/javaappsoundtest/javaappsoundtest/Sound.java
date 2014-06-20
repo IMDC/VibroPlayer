@@ -66,7 +66,7 @@ public class Sound {
         return filePath;
     }
     
-    public void read() {
+    public void read() throws Exception {
         this.waveFile.read();
     }
     
