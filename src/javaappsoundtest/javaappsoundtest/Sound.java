@@ -70,7 +70,11 @@ public class Sound {
         this.waveFile.read();
     }
     
-    public ByteBuffer getSampleAt ( int index ) {
+    public float getSampleAt ( int index ) {
         return this.waveFile.getSampleAt ( index );
+    }
+    
+    public int getSamplesSize() {
+        return this.waveFile.getNumSamples();
     }
 }

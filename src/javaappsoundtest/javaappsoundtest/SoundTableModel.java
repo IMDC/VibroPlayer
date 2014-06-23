@@ -138,7 +138,7 @@ public class SoundTableModel extends AbstractTableModel {
     public Sound getSoundByCommand ( String command ) {
         for ( Sound s: datalist ) {
             if ( s.getCommand().equals ( command ) ) {
-                System.out.println ( "Found" );
+                return s;
             }
         }
         return null;

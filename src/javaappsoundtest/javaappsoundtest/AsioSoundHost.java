@@ -4,6 +4,7 @@ import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
 import java.io.FileInputStream;
+import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -37,25 +38,21 @@ public class AsioSoundHost implements AsioDriverListener {
     private float[] output;
     
     private boolean[] channel;
-    private long startTime;
     
-    /* Can we throw it out when move the file load? */
-        FileInputStream inputStream;
+    int currentCounter;
+    
+    FileInputStream inputStream;
 
-        int frameSize;
-        
-        int startFloat = 20;
-    
-        int currentCounter = startFloat;
-        
-        String musicToPlay;
+    int frameSize;
+
+    Sound soundToPlay;
     /**
      * Class constructor. This is the constructor of the class that initializes
      * everything needed such as buffer size, list of active channels and output variable.
      * 
      * @param driver Receive the current driver to be used.
      */
-    AsioSoundHost ( AsioDriver driver, String musicName ) {
+    AsioSoundHost ( AsioDriver driver, Sound sound ) {
         if ( driver != null ) {
             /* Get and instanciate the driver and its listener */
                 this.driver = driver;
@@ -71,7 +68,6 @@ public class AsioSoundHost implements AsioDriverListener {
             /* Add all the 7 channels of the chair to a list and then to the driver */
                 activeChannels = new HashSet<>();
                 for ( int i = 0; i < 8; i++ ) {
-                    AsioChannel ac = this.driver.getChannelOutput ( i );
                     activeChannels.add ( this.driver.getChannelOutput ( i ) );
                 }
                 this.driver.createBuffers ( activeChannels );
@@ -82,19 +78,15 @@ public class AsioSoundHost implements AsioDriverListener {
                     channel[i] = true;
                 }
                 
-                for ( int i = 0; i < channel.length; i++ ) {
-                    addChannel(i);
-                }
+                this.soundToPlay = sound;
+                this.setPattern ( this.soundToPlay.getPattern() );
                 
-                this.musicToPlay = musicName;
+                this.currentCounter = 0;
         }
     }
     
     public void restart() {
-        this.currentCounter = startFloat;
-        if ( ServerGUI.musicName != "stop" || ServerGUI.musicName != "stand" ) {
-            this.musicToPlay = ServerGUI.musicName;
-        }
+        this.currentCounter = 0;
     }
     
     /**
@@ -102,17 +94,32 @@ public class AsioSoundHost implements AsioDriverListener {
      * 
      * @param channel This is the channel to be added into the active list.
      */
-    public void addChannel ( int channel ) {
-        this.channel[channel] = true;
-    }
-    
-    /**
-     * This method remove a channel to the list of active channels.
-     * 
-     * @param channel This is the channel to be removed of the active list.
-     */
-    public void removeChannel ( int channel ) {
-        this.channel[channel] = false;
+    public void setPattern ( ChairPattern pattern ) {
+        if ( pattern == ChairPattern.BOTTOM4 ) {
+            for ( int i = 0; i < 4; i++ ) {
+                channel[i] = false;
+            }
+
+            for ( int i = 4; i < 8; i++ ) {
+                channel[i] = true;
+            }
+        }
+        else {
+            if ( pattern == ChairPattern.TOP4 ) {
+                for ( int i = 0; i < 4; i++ ) {
+                    channel[i] = true;
+                }
+                
+                for ( int i = 4; i < 8; i++ ) {
+                    channel[i] = false;
+                }
+            }
+            else {
+                for ( int i = 0; i < 8; i++ ) {
+                    channel[i] = true;
+                }
+            }
+        }
     }
 
     /**
@@ -124,30 +131,19 @@ public class AsioSoundHost implements AsioDriverListener {
         return frameSize;
     }
     
-    public String getMusicName() {
-        return this.musicToPlay;
-    }
-    
     @Override
     public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
-
-        /* Get the elapsed time (difference between the current time and the start time and convert it to seconds. */
-            long elapsedTime = ((sampleTime - startTime) / 1000000);
-            
-            if ( ServerGUI.musicName != "stop" || ServerGUI.musicName != "stand" ) {
-                musicToPlay = ServerGUI.musicName;
+        output = new float[bufferSize];
+        
+        for( int i = 0; i < output.length ; i++, currentCounter++) {
+            int sampleSize = this.soundToPlay.getSamplesSize();
+            if ( currentCounter >= sampleSize ) {
+                this.restart();
             }
             
-            for( int i = 0; i < output.length ; i++, currentCounter++) {
-                /*Music m = ServerGUI.getMusicByName ( musicToPlay );
-                
-                //this is to repeat the sound
-                if ( currentCounter >= m.getMaxCount() - 1500 ) {
-                    this.restart();
-                }
-
-                output[i] = m.getFloat ( currentCounter );*/
-            }
+            float currentSample = this.soundToPlay.getSampleAt ( currentCounter );
+            output[i] = currentSample;
+        }
 
         /* Runs all the channel in the active list */
             for ( AsioChannel channelInfo : activeChannels ) {
@@ -157,8 +153,6 @@ public class AsioSoundHost implements AsioDriverListener {
                     channelInfo.write ( output );
                 }
             }
-            
-            output = new float[bufferSize];
     }
     
     @Override

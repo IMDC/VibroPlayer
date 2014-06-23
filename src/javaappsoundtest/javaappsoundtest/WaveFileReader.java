@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.ArrayList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
 /**
@@ -47,7 +45,7 @@ public class WaveFileReader {
     private int frameSize;
     
     /* data */
-    private ArrayList<ByteBuffer> samples;
+    private ArrayList<Float> samples;
         
     private File file;
     //private AudioFormat audioFormat;
@@ -240,7 +238,7 @@ public class WaveFileReader {
         return this.numChannels;
     }
     
-    public ArrayList<ByteBuffer> getSamples() {
+    public ArrayList<Float> getSamples() {
         return this.samples;
     }
     
@@ -248,13 +246,13 @@ public class WaveFileReader {
         return chunkSize / sampleRate / ( bitsPerSample / 8 ) / numChannels;
     }
     
-    public ByteBuffer getSampleAt ( int at ) {
-        return this.samples.get ( at );
+    public float getSampleAt ( int at ) {
+        float toReturn = this.samples.get ( at );
+        return toReturn;
     }
     
     public int getNumSamples() {
-        //return this.numSamples;
-        return 0;
+        return this.numSamples;
     }
     
     public void read() throws Exception {
@@ -282,12 +280,14 @@ public class WaveFileReader {
 
             /* get all the samples of the file */
             for ( ; samples.size() < numSamples; ) {
+                sample = new byte[frameSize];
+                
                 /* group the samples in frames */
                 for ( int i = 0; i < frameSize; i++, dataBytes++ ) {
                     sample[i] = (byte) inputStream.read();
                 }
 
-                samples.add ( ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ) );
+                samples.add ( ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ).getFloat() );
 
                 System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
 
