@@ -7,11 +7,16 @@
 package javaappsoundtest;
 
 import com.synthbot.jasiohost.AsioDriver;
+import java.awt.BorderLayout;
+import java.awt.Dialog;
 import java.io.File;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
+import javax.swing.JDialog;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JProgressBar;
 
 /**
  *
@@ -23,6 +28,8 @@ public class ServerGUI extends javax.swing.JFrame {
     public static String defaultPath = "./IntimateInterfaceServer";
     public static final File path = new File ( defaultPath );
     public static final File config = new File ( defaultPath + "/config.txt" );
+    
+    public static JProgressBar dpb;
     
     protected SoundTableModel sounds;
     
@@ -37,7 +44,7 @@ public class ServerGUI extends javax.swing.JFrame {
     
     public static String musicName;
     
-    private boolean filesRead;
+    public static boolean filesRead;
     
     public static String getCurrentTime() {
         DateFormat dateFormat = new SimpleDateFormat ( "yyyy/MM/dd HH:mm:ss" );
@@ -89,6 +96,8 @@ public class ServerGUI extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         log = new javax.swing.JTextArea();
         readFiles = new javax.swing.JButton();
+        progressBar = new javax.swing.JProgressBar();
+        progressBarText = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
@@ -116,6 +125,8 @@ public class ServerGUI extends javax.swing.JFrame {
                 readFilesActionPerformed(evt);
             }
         });
+
+        progressBarText.setText(" ");
 
         jMenu1.setText("File");
         jMenuBar1.add(jMenu1);
@@ -155,16 +166,20 @@ public class ServerGUI extends javax.swing.JFrame {
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addGap(35, 35, 35)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 648, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(36, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addGap(179, 179, 179)
                 .addComponent(readFiles)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 193, Short.MAX_VALUE)
                 .addComponent(startServer)
                 .addGap(175, 175, 175))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(progressBarText)
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 648, Short.MAX_VALUE)
+                        .addComponent(progressBar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -175,7 +190,11 @@ public class ServerGUI extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(startServer)
                     .addComponent(readFiles))
-                .addGap(93, 93, 93))
+                .addGap(32, 32, 32)
+                .addComponent(progressBarText)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(22, 22, 22))
         );
 
         setSize(new java.awt.Dimension(735, 518));
@@ -236,17 +255,26 @@ public class ServerGUI extends javax.swing.JFrame {
         readFiles.setEnabled ( false );
         
         //Should put it in a thread
-        try {
-            sounds.readFiles();
-            filesRead = true;
-        }
-        catch ( Exception ex ) {
-            ServerGUI.log.append ( getCurrentTime() + ex.getMessage() + "\n" );
-            filesRead = false;
+        Thread t1 = new Thread() {
             
-            readFiles.setText ( "Read Files" );
-            readFiles.setEnabled ( true );
-        }
+            @Override
+            public void run() {
+                try {
+                    sounds.readFiles();
+                    ServerGUI.filesRead = true;
+                }
+                catch ( Exception ex ) {
+                    ServerGUI.log.append ( getCurrentTime() + ex.getMessage() + "\n" );
+                    filesRead = false;
+
+                    readFiles.setText ( "Read Files" );
+                    readFiles.setEnabled ( true );
+                }
+            }
+        };
+        t1.start();
+        
+        System.out.println ( "Thread finished" );
         
     }//GEN-LAST:event_readFilesActionPerformed
 
@@ -271,6 +299,8 @@ public class ServerGUI extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JScrollPane jScrollPane1;
     public static javax.swing.JTextArea log;
+    public static javax.swing.JProgressBar progressBar;
+    public static javax.swing.JLabel progressBarText;
     private javax.swing.JButton readFiles;
     private javax.swing.JButton startServer;
     // End of variables declaration//GEN-END:variables

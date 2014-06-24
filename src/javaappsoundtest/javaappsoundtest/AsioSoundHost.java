@@ -96,28 +96,35 @@ public class AsioSoundHost implements AsioDriverListener {
      */
     public void setPattern ( ChairPattern pattern ) {
         if ( pattern == ChairPattern.BOTTOM4 ) {
-            for ( int i = 0; i < 4; i++ ) {
-                channel[i] = false;
-            }
-
-            for ( int i = 4; i < 8; i++ ) {
-                channel[i] = true;
-            }
+            channel[0] = false;
+            channel[1] = false;
+            channel[2] = false;
+            channel[3] = false;
+            channel[4] = true;
+            channel[5] = true;
+            channel[6] = true;
+            channel[7] = true;
         }
         else {
             if ( pattern == ChairPattern.TOP4 ) {
-                for ( int i = 0; i < 4; i++ ) {
-                    channel[i] = true;
-                }
-                
-                for ( int i = 4; i < 8; i++ ) {
-                    channel[i] = false;
-                }
+                channel[0] = true;
+                channel[1] = true;
+                channel[2] = true;
+                channel[3] = true;
+                channel[4] = false;
+                channel[5] = false;
+                channel[6] = false;
+                channel[7] = false;
             }
             else {
-                for ( int i = 0; i < 8; i++ ) {
-                    channel[i] = true;
-                }
+                channel[0] = true;
+                channel[1] = true;
+                channel[2] = true;
+                channel[3] = true;
+                channel[4] = true;
+                channel[5] = true;
+                channel[6] = true;
+                channel[7] = true;
             }
         }
     }

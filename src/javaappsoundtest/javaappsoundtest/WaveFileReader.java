@@ -289,15 +289,12 @@ public class WaveFileReader {
 
                 samples.add ( ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ).getFloat() );
 
-                System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
-
-                if ( Math.round ( dataBytes * 100 / chunkSize ) == 99 ) {
-                    System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
-                }
+                ServerGUI.progressBar.setValue ( Math.round ( dataBytes * 100 / chunkSize ) );
             }
             
+            ServerGUI.progressBar.setValue ( 100 );
+            
             inputStream.close();
-            System.out.println ( "Finished" );
         
         } catch ( FileNotFoundException ex ) {
             throw new Exception ( "Problem with \"" + file.getName() + "\" file. Make sure to follow the instructions described in \"Help\"" );
