@@ -7,6 +7,7 @@
 package javaappsoundtest;
 
 import com.synthbot.jasiohost.AsioDriver;
+import com.synthbot.jasiohost.AsioDriverState;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.io.File;
@@ -99,7 +100,6 @@ public class ServerGUI extends javax.swing.JFrame {
         progressBar = new javax.swing.JProgressBar();
         progressBarText = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
-        jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
         jMenuItem2 = new javax.swing.JMenuItem();
@@ -127,9 +127,6 @@ public class ServerGUI extends javax.swing.JFrame {
         });
 
         progressBarText.setText(" ");
-
-        jMenu1.setText("File");
-        jMenuBar1.add(jMenu1);
 
         jMenu2.setText("Configure");
         jMenu2.setToolTipText("");
@@ -221,6 +218,11 @@ public class ServerGUI extends javax.swing.JFrame {
             }
             else {
                 server.setRunning ( false );
+                driver.stop();
+                driver.returnToState(AsioDriverState.INITIALIZED);
+                driver.removeAllAsioDriverListeners();
+                listener = null;
+                server.setRunning ( false );
                 startServer.setText ( "START Server" );
                 log.append ( getCurrentTime() + "Server stopped.\n" );
             }
@@ -292,7 +294,6 @@ public class ServerGUI extends javax.swing.JFrame {
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JMenu help;
-    private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
     private javax.swing.JMenuItem jMenuItem1;

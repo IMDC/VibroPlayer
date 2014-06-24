@@ -52,7 +52,7 @@ import java.util.Set;
 public class AsioDriver {
   
   private AsioDriverState currentState;
-  private final List<AsioDriverListener> listeners;
+  private List<AsioDriverListener> listeners;
   private final Set<AsioChannel> activeChannels;
   private final AsioChannel[] inputChannels;
   private final AsioChannel[] outputChannels;
@@ -613,6 +613,18 @@ public class AsioDriver {
       listeners.remove(listener);
     } else {
       throw new IllegalStateException("AsioDriverListeners can only be updated while the " +
+          "AsioDriver is in the LOADED or INITIALIZED state.");
+    }
+  }
+  
+   public synchronized void removeAllAsioDriverListeners() {
+    if ( currentState.ordinal() < AsioDriverState.PREPARED.ordinal() ) {
+        if ( !listeners.isEmpty() ) {
+            listeners = null;
+            listeners = new ArrayList<AsioDriverListener>();
+        }
+    } else {
+        throw new IllegalStateException("AsioDriverListeners can only be updated while the " +
           "AsioDriver is in the LOADED or INITIALIZED state.");
     }
   }

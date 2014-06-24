@@ -141,7 +141,7 @@ public class AsioSoundHost implements AsioDriverListener {
     @Override
     public void bufferSwitch(long sampleTime, long samplePosition, Set<AsioChannel> activeChannels) {
         output = new float[bufferSize];
-        
+        System.out.println ( this.soundToPlay.getCommand() + " - " + this.soundToPlay.getPattern() );
         for( int i = 0; i < output.length ; i++, currentCounter++) {
             int sampleSize = this.soundToPlay.getSamplesSize();
             if ( currentCounter >= sampleSize ) {
