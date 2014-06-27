@@ -6,7 +6,9 @@ package vibrointerpreter;
  * and open the template in the editor.
  */
 import com.synthbot.jasiohost.AsioDriver;
+import java.io.IOException;
 import java.util.ArrayList;
+import javax.sound.sampled.UnsupportedAudioFileException;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
 import javax.swing.JProgressBar;
@@ -29,6 +31,8 @@ public class VibroGUI extends javax.swing.JFrame {
     ArrayList <JProgressBar> bars = new ArrayList();
     ArrayList <JSlider> sliders = new ArrayList();
     ArrayList <JPanel> panels = new ArrayList();
+    
+    WaveFileReader waveFile;
     /**
      * Creates new form VibroGUI
      */
@@ -1191,7 +1195,6 @@ public class VibroGUI extends javax.swing.JFrame {
 
     private void useWaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useWaveActionPerformed
         // TODO add your handling code here:
-      
     }//GEN-LAST:event_useWaveActionPerformed
 
     private void enableBottomActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_enableBottomActionPerformed

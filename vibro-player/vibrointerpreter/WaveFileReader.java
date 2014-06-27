@@ -35,6 +35,7 @@ public class WaveFileReader {
         private ArrayList<Byte> options;
         private String subChunk2ID;
         private int subchunk2Size;
+        private int numSamples;
         
         int aux;
     /* bytes of the header (header size) */
@@ -43,7 +44,7 @@ public class WaveFileReader {
     private int frameSize;
     
     /* data */
-    private ArrayList<byte[]> samples;
+    private ArrayList<ByteBuffer> samples;
         
     private File file;
     //private AudioFormat audioFormat;
@@ -67,6 +68,7 @@ public class WaveFileReader {
         this.subchunk2Size = 0;
         this.headerSize = 0;
         this.frameSize = 0;
+        this.numSamples = 0;
         
         this.samples = new ArrayList<>();
         
@@ -219,6 +221,9 @@ public class WaveFileReader {
             }
             subchunk2Size = ByteBuffer.wrap ( bigSample ).order ( ByteOrder.LITTLE_ENDIAN ).getInt();
             
+        /* get num samples */
+            numSamples = ( 8 * subchunk2Size ) / ( numChannels * bitsPerSample );
+            
         return true;
     }
     
@@ -230,12 +235,21 @@ public class WaveFileReader {
         return this.numChannels;
     }
     
-    public ArrayList<byte[]> getSamples() {
+    public ArrayList<ByteBuffer> getSamples() {
         return this.samples;
     }
     
     public float getDuration() {
         return chunkSize / sampleRate / ( bitsPerSample / 8 ) / numChannels;
+    }
+    
+    public ByteBuffer getSampleAt ( int at ) {
+        return this.samples.get ( at );
+    }
+    
+    public int getNumSamples() {
+        //return this.numSamples;
+        return 0;
     }
     
     public void read() {
@@ -253,25 +267,27 @@ public class WaveFileReader {
             
             int dataBytes = headerSize;
             
+            System.out.println ( "Reading the file" );
+            
             /* get all the samples of the file */
-            for ( ; dataBytes < chunkSize; dataBytes++ ) {
+            for ( ; samples.size() < numSamples; ) {
                 /* group the samples in frames */
                 for ( int i = 0; i < frameSize; i++, dataBytes++ ) {
-                    sample[i] = (byte) inputStream.read();;
+                    sample[i] = (byte) inputStream.read();
                 }
                 
-                samples.add ( sample );
+                samples.add ( ByteBuffer.wrap ( sample ).order ( ByteOrder.LITTLE_ENDIAN ) );
                 
                 System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
                 
-                /*if ( Math.round ( dataBytes * 100 / chunkSize ) == 99 ) {
+                if ( Math.round ( dataBytes * 100 / chunkSize ) == 99 ) {
                     System.out.println ( Math.round ( dataBytes * 100 / chunkSize ) );
-                }*/
+                }
             }
+            System.out.println ( "Finished" );
         }
         catch ( IOException ex ) {
             System.out.println ( ex );
         }
     }
-    
 }
