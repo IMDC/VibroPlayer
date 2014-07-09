@@ -32,7 +32,7 @@ public class VibroHelper{
     static boolean isPlaying =false;
     static VibroGUI GUI;
     static int[] outputValues = new int[MAX], volumes = new int[MAX];
-    static int arrangement = 0;//0=All 8, 2=Top 4, 1=Bottom 4
+    static int arrangement = 0, TOP=2, BOTTOM=1, ALL=0;//0=All 8, 2=Top 4, 1=Bottom 4
     
     public VibroHelper(VibroGUI gui){
         GUI=gui;        
@@ -169,7 +169,7 @@ public class VibroHelper{
                         GUI.bars.get(i).setValue(outputValues[i+1]);
                     }else{
                         GUI.bars.get(i).setValue(curVal-1);
-                        outputValues[0]-=.1;
+                        outputValues[0]-=.05;
                     }
                 }
                 
@@ -178,7 +178,7 @@ public class VibroHelper{
                     GUI.visualBar_volume.setValue(outputValues[0]);
                 }else{
                     GUI.visualBar_volume.setValue(curVal-1);
-                    outputValues[0]-=.1;
+                    outputValues[0]-=.05;
                 }
                 if (!isPlaying) GUI.visualBar_volume.setValue(0);
                 try {
@@ -186,14 +186,20 @@ public class VibroHelper{
                 } catch (InterruptedException ex) {
                     Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
+                
+                if(!GUI.play.getText().equals("STOP")){
+                    currThread++;
+                    isPlaying=false;
+                }
             }           
         }
     };
     
-    //Manage output to output device
+    //Manage data to output device
     static Runnable outputManager = new Runnable(){
+        int sleepTime=0;
         public void run(){
-            int thisThread = currThread;
+            int thisThread = currThread;       
             while(thisThread == currThread){ 
                 float[] sampleWave = new float[GUI.listener.getBufferSize()/2];
                 try {
@@ -204,18 +210,13 @@ public class VibroHelper{
                         }
                         if (outputValues[i+1]!=0) GUI.listener.output ( i, sampleWave );
                     }               
-                    Thread.sleep(1000);
+                    Thread.sleep(sleepTime);
                 } catch (InterruptedException ex) {
                     Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 catch (BufferOverflowException e) {
-                    //Logger.getLogger(MidiHelper.class.getName()).log(Level.WARNING, null, e);
-                    System.out.println("Warning Buffer overload ;"+GUI.listener.getBufferSize()+"\n");
-                    try {
-                        GUI.listener.wait(1000);
-                    } catch (InterruptedException ex) {
-                        Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
-                    }
+                    if(sleepTime<2000)sleepTime++;
+                    System.out.print("\tWarning Buffer overload..Sleep Time increased: "+sleepTime);              
                 }
             }
         }
@@ -223,69 +224,70 @@ public class VibroHelper{
     
     public static int getOutputNum(int key){
         if(numOutputs == 8){  
-            if(GUI.enableBottom.isSelected())arrangement=1;
-            else if(GUI.enableTop.isSelected())arrangement=2;
-            else arrangement=0;
+            if(GUI.enableBottom.isSelected())arrangement=TOP;
+            else if(GUI.enableTop.isSelected())arrangement=BOTTOM;
+            else arrangement=ALL;
             
             if(keyHertz[key]>1480 && keyHertz[key]<4186){               
-                if(arrangement==1)return 8;
-                if(arrangement==2)return 4;
+                if(arrangement==BOTTOM)return 8;
+                if(arrangement==TOP)return 4;
                 return 8;
             }
             if(keyHertz[key]>660 && keyHertz[key]<1480){
-                if(arrangement==1)return 8;
-                if(arrangement==2)return 4;
+                if(arrangement==BOTTOM)return 8;
+                if(arrangement==TOP)return 4;
                 return 7;
             }
             if(keyHertz[key]>467 && keyHertz[key]<660){
-                if(arrangement==1)return 7;
-                if(arrangement==2)return 3;
+                if(arrangement==BOTTOM)return 7;
+                if(arrangement==TOP)return 3;
                 return 6;
             }
             if(keyHertz[key]>311 && keyHertz[key]<466){
-                if(arrangement==1)return 7;
-                if(arrangement==2)return 3;
+                if(arrangement==BOTTOM)return 7;
+                if(arrangement==TOP)return 3;
                 return 5;
             }
             if(keyHertz[key]>220 && keyHertz[key]<311){
-                if(arrangement==1)return 6;
-                if(arrangement==2)return 2;
+                if(arrangement==BOTTOM)return 6;
+                if(arrangement==TOP)return 2;
                 return 4;
             }
             if(keyHertz[key]>145 && keyHertz[key]<220){
-                if(arrangement==1)return 6;
-                if(arrangement==2)return 2;
+                if(arrangement==BOTTOM)return 6;
+                if(arrangement==TOP)return 2;
                 return 3;
             }
             if(keyHertz[key]>69 && keyHertz[key]<145){
-                if(arrangement==1)return 5;
-                if(arrangement==2)return 1;
+                if(arrangement==BOTTOM)return 5;
+                if(arrangement==TOP)return 1;
                 return 2;
             }
             if(keyHertz[key]>27.5 && keyHertz[key]<69){
-                if(arrangement==1)return 5;
-                if(arrangement==2)return 1;
+                if(arrangement==BOTTOM)return 5;
+                if(arrangement==TOP)return 1;
                 return 1;
             }
         }
         return (key-minKey)/((maxKey-minKey)/numOutputs)+1;
     }
     
+    //reads decodes and plays a wav file to the specified input channel
     public void playWave(int channel, float[][]data){     
         Runnable playSound = new Runnable(){
             public void run(){
-                final int BUFFER_SIZE = 12800;
+                final int BUFFER_SIZE = 12800;//12800;
                 File soundFile = null;
                 AudioInputStream audioStream = null;
                 AudioFormat audioFormat;
                 SourceDataLine sourceLine = null;  
                 int chan=channel;
                 //set output channels according to specified arrangements
-                if(GUI.enableBottom.isSelected())arrangement=1;
-                else if(GUI.enableTop.isSelected())arrangement=2;
-                else arrangement=0;
-                if(arrangement==1)chan=((channel+1)/2)+4;
-                else if(arrangement==2)chan=(channel+1)/2;
+                if(GUI.enableBottom.isSelected())arrangement=BOTTOM;
+                else if(GUI.enableTop.isSelected())arrangement=TOP;
+                else arrangement=ALL;
+                if(arrangement==BOTTOM)chan=((channel+1)/2)+4;
+                else if(arrangement==TOP)chan=(channel+1)/2;
                 
                 isPlaying=true;               
                 
@@ -311,14 +313,9 @@ public class VibroHelper{
                 
                 if ( !AudioSystem.isLineSupported ( info ) ) {
                     // This is the PCM format we want to transcode to.
-                    // The parameters here are audio format details that you
-                    // shouldn't need to understand for casual use.
                     AudioFormat pcm = new AudioFormat ( audioFormat.getSampleRate(), 16, audioFormat.getChannels(), true, false);
-
-                    // Get a wrapper stream around the input stream that does the
-                    // transcoding for us.
+                    // Get a wrapper stream around the input stream that does the transcoding for us.
                     audioStream = AudioSystem.getAudioInputStream ( pcm, audioStream );
-
                     // Update the format and info variables for the transcoded data
                     audioFormat = audioStream.getFormat();
                     info = new DataLine.Info ( SourceDataLine.class, audioFormat );
@@ -337,13 +334,14 @@ public class VibroHelper{
 
                 sourceLine.start();                
                 
-                int delay = 3;//wave audio/device delay (by framesize
+                int delay = 4;//computer playback / output device playback delay (by framesize)
+                int sleepTime = 0;
                 int nBytesRead = 0;
                 int numFramesRead = 0;
                 int bytesPerFrame = audioStream.getFormat().getFrameSize();
                 int totalFramesRead = 0;
                 byte[] abData = new byte[BUFFER_SIZE];
-                float[] sampleWave = new float[GUI.listener.getBufferSize()/numOutputs];               
+                float[] sampleWave;               
                 while (nBytesRead != -1 && isPlaying) {
                     try {
                         nBytesRead = audioStream.read(abData, 0, abData.length);
@@ -352,15 +350,20 @@ public class VibroHelper{
                         numFramesRead = nBytesRead / bytesPerFrame;
                         totalFramesRead += numFramesRead;
                         
-                        //visualiser
-                        outputValues[chan]= (Math.abs(abData[numFramesRead]) * GUI.sliders.get(chan-1).getValue()/100  *GUI.volumeSlider.getValue()/100);
+                        //data for visualiser
+                        outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.sliders.get(chan-1).getValue()*GUI.volumeSlider.getValue())/50;
+                        GUI.progress.setValue(100*totalFramesRead/data[channel].length);
 
                         //output to device
-                        if(GUI.outToDevice.isSelected() && GUI.driverLoaded ){                        
-                            for ( int k = 0; k < GUI.listener.getBufferSize()/numOutputs; k++ ) {
-                                sampleWave[k] = ( data[channel][totalFramesRead-(numFramesRead*delay)+k]  * GUI.sliders.get(chan-1).getValue()/100  *GUI.volumeSlider.getValue()/100);
-                            }                      
+                        if(GUI.outToDevice.isSelected() && GUI.driverLoaded ){ 
+                            delay=GUI.delayTuner.getValue();
+                            sampleWave = new float[(int)(GUI.listener.getBufferSize()/1.5)];
+                            for ( int k = 0; k < sampleWave.length; k++ ) {
+                                sampleWave[k] = ( data[channel][totalFramesRead-(numFramesRead*delay)+(k*numFramesRead/sampleWave.length)]*GUI.sliders.get(chan-1).getValue()/100 *GUI.volumeSlider.getValue()/100);                                
+                            }                            
                             GUI.listener.output ( chan-1, sampleWave );
+                            Thread.sleep(sleepTime);
+                            //AsioSoundHost.playWaveFile(data[channel]);
                         }
 
 
@@ -368,7 +371,13 @@ public class VibroHelper{
                         e.printStackTrace();
                     } catch (ArrayIndexOutOfBoundsException a) {
                         System.out.println("Delay of "+delay);
+                    } catch (InterruptedException ex) {
+                        Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
+                    } catch (BufferOverflowException b){
+                        sleepTime++; 
+                        System.out.println("Warning Buffer overload..Sleep Time increased: "+sleepTime);
                     }
+                    
                     if (nBytesRead >= 0) {
                         @SuppressWarnings("unused")
                         int nBytesWritten = sourceLine.write(abData, 0, nBytesRead);
@@ -378,7 +387,6 @@ public class VibroHelper{
                 sourceLine.drain();
                 sourceLine.close();
                 isPlaying = false;
-                currThread++;
             }
         };        
         Thread playS = new Thread(playSound);
@@ -450,7 +458,7 @@ public class VibroHelper{
                     Thread thread3 = new Thread(outputManager);                   
                     thread3.start();                                       
                 }
-                
+                                
                 if (msg instanceof ShortMessage){
                     ShortMessage sm = (ShortMessage) msg;
                     double newVolumeAll = GUI.volumeSlider.getValue();

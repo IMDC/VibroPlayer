@@ -5,7 +5,6 @@ import com.synthbot.jasiohost.AsioChannel;
 import com.synthbot.jasiohost.AsioDriver;
 import com.synthbot.jasiohost.AsioDriverListener;
 import com.synthbot.jasiohost.AsioDriverState;
-import java.nio.ByteBuffer;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -26,12 +25,11 @@ public class AsioSoundHost implements AsioDriverListener {
     private double sampleRate;
     private Set<AsioChannel> activeChannels;
     
-    private WaveFileReader waveFile;
-    private boolean play = false;
+    private static float[] waveFile;
+    private static boolean play = false;
     private int currentSample;
     
     private float out[];
-    private ByteBuffer byteBufferOut[];
     
     public AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
@@ -52,7 +50,6 @@ public class AsioSoundHost implements AsioDriverListener {
             currentSample = 0;
             
             out = new float[this.bufferSize];
-            byteBufferOut = new ByteBuffer[this.bufferSize];
         }
     }
     
@@ -60,27 +57,26 @@ public class AsioSoundHost implements AsioDriverListener {
         if ( play ) {
             //should load the samples and play it
             for ( int i = 0; i < this.bufferSize; i++, currentSample++ ) {
-                if ( currentSample < waveFile.getNumSamples() ) {
-                    ByteBuffer samples = waveFile.getSampleAt ( currentSample );
-                    byteBufferOut[i] = samples;
+                if ( currentSample < waveFile.length ) {
+                    out[i] = waveFile[currentSample];
                 }
                 else {
-                    byteBufferOut[i] = null;
+                    out[i] = 0;
                 }
             }
 
             for ( AsioChannel channelInfo : channels ) {
-                if ( channelInfo.getChannelIndex() == 0 ) {
-                    channelInfo.write ( byteBufferOut );
+                if ( channelInfo.getChannelIndex() != 0 ) {
+                    channelInfo.write ( out);
                 }
             }
         }
         
     }
     
-    public void playWaveFile ( WaveFileReader file ) {
+    public static void playWaveFile ( float[] file ) {
         play = true;
-        this.waveFile = file;
+        waveFile = file;
     }
     
     public void bufferSizeChanged(int bufferSize) {

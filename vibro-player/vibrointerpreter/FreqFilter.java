@@ -12,7 +12,11 @@ package vibrointerpreter;
  */
 /* Necessary package imports */
 import com.mathworks.toolbox.javabuilder.*;
-import FrequencyFilter.*;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 
 class FreqFilter{
     public static float[][] main(String[] args){
@@ -26,9 +30,9 @@ class FreqFilter{
                 System.out.println("Error: must enter file");
                 return null;
             }
-
+            init();
             theFilter = new FrequencyFilter.Class1();
-            /* Compute magic square and print result */
+            /* Convert Wave File into frequency data */
             result = theFilter.FrequencyFilter(1,args[0]);
             MWNumericArray temp = (MWNumericArray)result[0];
             float[][] out = (float[][])temp.toFloatArray();           
@@ -50,5 +54,26 @@ class FreqFilter{
             theFilter.dispose();
             return output;
         }
+    }
+    
+    public static void write(double[] data){
+        try {
+        BufferedWriter out = new BufferedWriter(new FileWriter("Frequency Split.txt"));
+            if(data==null){
+                double[] d = {27.5,69,69,145,145,220,220,311,311,466,467,660,660,1480,1480,4186};
+                data=d;
+            }
+            for (int i = 0; i < data.length; i++) {
+                out.write(data[i] + "  ");
+            }
+            out.close();
+        } catch (IOException e) {}        
+    }
+    
+    public static void init() throws FileNotFoundException{
+        File file = new File("Frequency Split.txt");        
+        if(!file.exists()){
+            write(null);
+        }        
     }
 }
