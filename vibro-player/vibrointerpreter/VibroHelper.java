@@ -32,7 +32,7 @@ public class VibroHelper{
     static boolean isPlaying =false;
     static VibroGUI GUI;
     static int[] outputValues = new int[MAX], volumes = new int[MAX];
-    static int arrangement = 0, TOP=2, BOTTOM=1, ALL=0;//0=All 8, 2=Top 4, 1=Bottom 4
+    static int arrangement = 0, TOP=2, BOTTOM=1, ALL=0;
     
     public VibroHelper(VibroGUI gui){
         GUI=gui;        
@@ -161,24 +161,25 @@ public class VibroHelper{
     //Controller for GUI graphics
     static Runnable slideAdjuster = new Runnable(){
         public void run(){
+            int clock = 0;
             int thisThread = currThread;
             while(thisThread == currThread){              
-                for(int i=0; i<numOutputs; i++){
+                for(int i=0; i<GUI.bars.size(); i++){
                     int curVal = GUI.bars.get(i).getValue();
                     if(outputValues[i] >= curVal){                        
                         GUI.bars.get(i).setValue(outputValues[i+1]);
-                    }else{
+                    }else if(clock%4==0){
                         GUI.bars.get(i).setValue(curVal-1);
-                        outputValues[0]-=.05;
+                        outputValues[0]-=1;
                     }
                 }
                 
                 int curVal = GUI.visualBar_volume.getValue();
                 if(outputValues[0] >= curVal){
                     GUI.visualBar_volume.setValue(outputValues[0]);
-                }else{
+                }else if(clock%8==0){
                     GUI.visualBar_volume.setValue(curVal-1);
-                    outputValues[0]-=.05;
+                    outputValues[0]-=1;
                 }
                 if (!isPlaying) GUI.visualBar_volume.setValue(0);
                 try {
@@ -187,11 +188,15 @@ public class VibroHelper{
                     Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 
+                clock++;
                 if(!GUI.play.getText().equals("STOP")){
                     currThread++;
                     isPlaying=false;
-                }
-            }           
+                }          
+            }
+            
+            for(int i=0; i<GUI.bars.size(); i++) GUI.bars.get(i).setValue(0); 
+            GUI.visualBar_volume.setValue(0);
         }
     };
     
@@ -199,7 +204,7 @@ public class VibroHelper{
     static Runnable outputManager = new Runnable(){
         int sleepTime=0;
         public void run(){
-            int thisThread = currThread;       
+            int thisThread = currThread;
             while(thisThread == currThread){ 
                 float[] sampleWave = new float[GUI.listener.getBufferSize()/2];
                 try {
@@ -273,10 +278,10 @@ public class VibroHelper{
     }
     
     //reads decodes and plays a wav file to the specified input channel
-    public void playWave(int channel, float[][]data){     
+    public void playWave(final int channel, final float[][]data){     
         Runnable playSound = new Runnable(){
             public void run(){
-                final int BUFFER_SIZE = 12800;//12800;
+                final int BUFFER_SIZE = 12800;
                 File soundFile = null;
                 AudioInputStream audioStream = null;
                 AudioFormat audioFormat;
@@ -301,19 +306,12 @@ public class VibroHelper{
                 
                 //Set audio format
                 audioFormat = audioStream.getFormat();
-                float sampleRate = audioFormat.getSampleRate();
-                int sampleSizeInBits = audioFormat.getSampleSizeInBits();
-                int channels = audioFormat.getChannels();
-                boolean signed = true;
-                boolean bigEndian = false;
-                audioFormat =  new AudioFormat(sampleRate, 
-                  sampleSizeInBits, channels, signed, bigEndian);
 
                 DataLine.Info info = new DataLine.Info(SourceDataLine.class, audioFormat);
                 
                 if ( !AudioSystem.isLineSupported ( info ) ) {
                     // This is the PCM format we want to transcode to.
-                    AudioFormat pcm = new AudioFormat ( audioFormat.getSampleRate(), 16, audioFormat.getChannels(), true, false);
+                    AudioFormat pcm = new AudioFormat ( audioFormat.getSampleRate(), 16, 2, true, false);
                     // Get a wrapper stream around the input stream that does the transcoding for us.
                     audioStream = AudioSystem.getAudioInputStream ( pcm, audioStream );
                     // Update the format and info variables for the transcoded data
@@ -352,12 +350,13 @@ public class VibroHelper{
                         
                         //data for visualiser
                         outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.sliders.get(chan-1).getValue()*GUI.volumeSlider.getValue())/50;
+                        outputValues[0]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.sliders.get(chan-1).getValue()*GUI.volumeSlider.getValue())/50;
                         GUI.progress.setValue(100*totalFramesRead/data[channel].length);
 
                         //output to device
                         if(GUI.outToDevice.isSelected() && GUI.driverLoaded ){ 
                             delay=GUI.delayTuner.getValue();
-                            sampleWave = new float[(int)(GUI.listener.getBufferSize()/1.5)];
+                            sampleWave = new float[(int)(GUI.listener.getBufferSize())];
                             for ( int k = 0; k < sampleWave.length; k++ ) {
                                 sampleWave[k] = ( data[channel][totalFramesRead-(numFramesRead*delay)+(k*numFramesRead/sampleWave.length)]*GUI.sliders.get(chan-1).getValue()/100 *GUI.volumeSlider.getValue()/100);                                
                             }                            
@@ -367,11 +366,14 @@ public class VibroHelper{
                         }
 
 
-                    } catch (IOException e) {
+                    } 
+                    catch (IOException e) {
                         e.printStackTrace();
-                    } catch (ArrayIndexOutOfBoundsException a) {
+                    } 
+                    catch (ArrayIndexOutOfBoundsException a) {
                         System.out.println("Delay of "+delay);
-                    } catch (InterruptedException ex) {
+                    } 
+                    catch (InterruptedException ex) {
                         Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
                     } catch (BufferOverflowException b){
                         sleepTime++; 

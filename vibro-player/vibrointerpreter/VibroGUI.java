@@ -6,7 +6,6 @@ package vibrointerpreter;
  * and open the template in the editor.
  */
 import com.synthbot.jasiohost.AsioDriver;
-import java.io.IOException;
 import java.util.ArrayList;
 import javax.swing.JFileChooser;
 import javax.swing.JPanel;
@@ -37,11 +36,7 @@ public class VibroGUI extends javax.swing.JFrame {
      */
     public VibroGUI() {
         initComponents();
-        setChannels(numChannels);    
-    }
-    
-    public void setChannels(int num){
-        
+        setChannels(numChannels);
         /* load the driver */
         try {
             driver = AsioDriver.getDriver ( "ASIO PreSonus FireStudio" );
@@ -49,10 +44,15 @@ public class VibroGUI extends javax.swing.JFrame {
             driver.start();
             driverLoaded = true;
         }
-        catch ( Exception e ) {
+        catch ( UnsatisfiedLinkError e ){ 
+            outText.setText("Please install the Following Driver: ASIO PreSonus FireStudio");
+            System.out.println("Please install the Following Driver: ASIO PreSonus FireStudio");
             driverLoaded = false;
-        }
-        
+        }           
+    }
+    
+    public void setChannels(int num){
+
         bars.clear();
         bars.add(visualBar1);
         bars.add(visualBar2);
@@ -160,15 +160,13 @@ public class VibroGUI extends javax.swing.JFrame {
         freqSave = new javax.swing.JButton();
         freqControlTxt = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        addChannel = new javax.swing.JButton();
         play = new javax.swing.JButton();
-        removeChannel = new javax.swing.JButton();
         outText = new javax.swing.JLabel();
         useMIDIFile = new javax.swing.JRadioButton();
         useMIDIDevice = new javax.swing.JRadioButton();
         outToDevice = new javax.swing.JRadioButton();
         useWaveFile = new javax.swing.JRadioButton();
-        progress = new javax.swing.JProgressBar();
+        useWaveFile2 = new javax.swing.JRadioButton();
         latencyPanel = new javax.swing.JPanel();
         delayTuner = new javax.swing.JSlider();
         delayTunerLabel = new javax.swing.JLabel();
@@ -241,6 +239,7 @@ public class VibroGUI extends javax.swing.JFrame {
         volumeSlider16 = new javax.swing.JSlider();
         visualBar16 = new javax.swing.JProgressBar();
         jLabel17 = new javax.swing.JLabel();
+        progress = new javax.swing.JProgressBar();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -250,7 +249,6 @@ public class VibroGUI extends javax.swing.JFrame {
 
         freqSplitControl.setTitle("Frequency Split Control");
         freqSplitControl.setMinimumSize(new java.awt.Dimension(540, 200));
-        freqSplitControl.setPreferredSize(new java.awt.Dimension(540, 200));
 
         ch1a.setHorizontalAlignment(javax.swing.JTextField.CENTER);
         ch1a.setText("27.5");
@@ -492,25 +490,10 @@ public class VibroGUI extends javax.swing.JFrame {
 
         jPanel1.setPreferredSize(new java.awt.Dimension(200, 100));
 
-        addChannel.setText("[-]   Remove CH");
-        addChannel.setHideActionText(true);
-        addChannel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                addChannelActionPerformed(evt);
-            }
-        });
-
         play.setText("START");
         play.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 playActionPerformed(evt);
-            }
-        });
-
-        removeChannel.setText(" [+]   Add CH ");
-        removeChannel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                removeChannelActionPerformed(evt);
             }
         });
 
@@ -536,10 +519,11 @@ public class VibroGUI extends javax.swing.JFrame {
         });
 
         inputGroup.add(useWaveFile);
-        useWaveFile.setSelected(true);
-        useWaveFile.setText("Input: Wave File");
+        useWaveFile.setText("Input: Wave File (Frequency Split)");
 
-        progress.setPreferredSize(new java.awt.Dimension(146, 5));
+        inputGroup.add(useWaveFile2);
+        useWaveFile2.setSelected(true);
+        useWaveFile2.setText("Input: Wave File (Channel Split)");
 
         delayTuner.setMajorTickSpacing(1);
         delayTuner.setMaximum(8);
@@ -550,7 +534,7 @@ public class VibroGUI extends javax.swing.JFrame {
         delayTuner.setValue(3);
 
         delayTunerLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        delayTunerLabel.setText("Latency Adjuster");
+        delayTunerLabel.setText("Latency Tuner");
 
         javax.swing.GroupLayout latencyPanelLayout = new javax.swing.GroupLayout(latencyPanel);
         latencyPanel.setLayout(latencyPanelLayout);
@@ -558,12 +542,12 @@ public class VibroGUI extends javax.swing.JFrame {
             latencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(latencyPanelLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(delayTunerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(delayTunerLabel, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                 .addContainerGap())
             .addGroup(latencyPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(latencyPanelLayout.createSequentialGroup()
                     .addContainerGap()
-                    .addComponent(delayTuner, javax.swing.GroupLayout.DEFAULT_SIZE, 408, Short.MAX_VALUE)
+                    .addComponent(delayTuner, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                     .addContainerGap()))
         );
         latencyPanelLayout.setVerticalGroup(
@@ -587,29 +571,22 @@ public class VibroGUI extends javax.swing.JFrame {
                 .addComponent(outText, javax.swing.GroupLayout.PREFERRED_SIZE, 582, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, Short.MAX_VALUE))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, jPanel1Layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(progress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(295, Short.MAX_VALUE)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(play, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(latencyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(78, 78, 78)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(useMIDIFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addGap(319, 319, 319)
-                        .addComponent(addChannel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(useMIDIDevice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGap(18, 18, 18)
+                        .addComponent(outToDevice))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(latencyPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(play, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(18, 18, 18)
-                        .addComponent(removeChannel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addGap(18, 18, 18)
-                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(useWaveFile)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(useMIDIFile, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(jPanel1Layout.createSequentialGroup()
-                                .addComponent(useMIDIDevice, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(18, 18, 18)
-                                .addComponent(outToDevice)))))
+                            .addComponent(useWaveFile)
+                            .addComponent(useWaveFile2))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addGap(200, 200, 200))
         );
         jPanel1Layout.setVerticalGroup(
@@ -618,24 +595,19 @@ public class VibroGUI extends javax.swing.JFrame {
                 .addComponent(outText)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                        .addComponent(removeChannel)
-                        .addComponent(play)
-                        .addComponent(addChannel))
+                    .addComponent(play)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                         .addComponent(useMIDIDevice)
                         .addComponent(outToDevice)))
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(useMIDIFile)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(useWaveFile))
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(latencyPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(progress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(useMIDIFile)
+                .addGap(2, 2, 2)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(latencyPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(useWaveFile)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(useWaveFile2)))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -1340,7 +1312,7 @@ public class VibroGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel19Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(visualBar16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(volumeSlider16, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE))
+                    .addComponent(volumeSlider16, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jLabel17))
         );
@@ -1398,7 +1370,7 @@ public class VibroGUI extends javax.swing.JFrame {
                     .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 269, Short.MAX_VALUE)
+                    .addComponent(jPanel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 273, Short.MAX_VALUE)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel19, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jPanel18, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -1410,6 +1382,8 @@ public class VibroGUI extends javax.swing.JFrame {
                     .addComponent(jPanel12, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
+
+        progress.setPreferredSize(new java.awt.Dimension(146, 5));
 
         jMenu1.setText("Menu");
 
@@ -1454,8 +1428,12 @@ public class VibroGUI extends javax.swing.JFrame {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1880, Short.MAX_VALUE)
+                .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 1121, Short.MAX_VALUE)
+            .addGroup(layout.createSequentialGroup()
+                .addGap(23, 23, 23)
+                .addComponent(progress, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(236, 236, 236))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1464,7 +1442,9 @@ public class VibroGUI extends javax.swing.JFrame {
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 127, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7))
+                .addGap(18, 18, 18)
+                .addComponent(progress, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(21, 21, 21))
         );
 
         pack();
@@ -1473,8 +1453,6 @@ public class VibroGUI extends javax.swing.JFrame {
     private void playActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playActionPerformed
         
         if(play.getText().equals("START")){
-            addChannel.setVisible(false);
-            removeChannel.setVisible(false);
             play.setText("STOP");
             
             if(useMIDIDevice.isSelected()){
@@ -1496,29 +1474,39 @@ public class VibroGUI extends javax.swing.JFrame {
                     }            
                 }catch(Exception e){System.out.println("AN error occured");} 
             }
-            if (useWaveFile.isSelected()){
-                VibroHelper midiHelper = new VibroHelper(this);
+            else if (useWaveFile.isSelected()){
+                VibroHelper wavHelper = new VibroHelper(this);
                 int rVal = c.showOpenDialog(VibroGUI.this);
                 if (rVal == JFileChooser.APPROVE_OPTION) {
                     fileFound=true;
                     outText.setText("Loading file...please wait");
                     String [] filePath = {c.getSelectedFile().getAbsolutePath()};                
                     float[][]data = FreqFilter.main(filePath);
-                    midiHelper.playWave(1,data);
-                    midiHelper.playWave(2,data);
-                    midiHelper.playWave(3,data);
-                    midiHelper.playWave(4,data);
-                    midiHelper.playWave(5,data); 
-                    midiHelper.playWave(6,data);
-                    midiHelper.playWave(7,data); 
-                    midiHelper.playWave(8,data); 
+                    for(int i=1; i<=8; i++){
+                        wavHelper.playWave(i,data); 
+                    }
                     latencyPanel.setVisible(true);                    
                     outText.setText(c.getSelectedFile().getName());                    
                 }
-            }             
-        }else{
-            addChannel.setVisible(true);
-            removeChannel.setVisible(true);   
+            }
+            else if (useWaveFile2.isSelected()){
+                VibroHelper wavHelper = new VibroHelper(this);
+                int rVal = c.showOpenDialog(VibroGUI.this);
+                if (rVal == JFileChooser.APPROVE_OPTION) {
+                    fileFound=true;
+                    outText.setText("Loading file...please wait");
+                    String [] filePath = {c.getSelectedFile().getAbsolutePath()};                
+                    float[][]data = ChanFilter.main(filePath);
+                    System.out.println(data.length+" lewr");
+                    for(int i=1; i<data.length; i++){
+                        wavHelper.playWave(i,data); 
+                    }
+                    setChannels(data.length-1);
+                    latencyPanel.setVisible(true);                    
+                    outText.setText(c.getSelectedFile().getName());                    
+                }
+            }     
+        }else{  
             latencyPanel.setVisible(false);
             play.setText("START");
             outText.setText("");
@@ -1529,16 +1517,6 @@ public class VibroGUI extends javax.swing.JFrame {
     }//GEN-LAST:event_playActionPerformed
 
     
-    private void removeChannelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_removeChannelActionPerformed
-       if(numChannels<16)
-            setChannels(numChannels+1);
-    }//GEN-LAST:event_removeChannelActionPerformed
-
-    private void addChannelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addChannelActionPerformed
-        if(numChannels>1)
-            setChannels(numChannels-1);
-    }//GEN-LAST:event_addChannelActionPerformed
-
     private void useFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_useFileActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_useFileActionPerformed
@@ -1635,14 +1613,12 @@ public class VibroGUI extends javax.swing.JFrame {
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new VibroGUI().setVisible(true);
-                
+                new VibroGUI().setVisible(true);                
             }
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton addChannel;
     private javax.swing.JTextField ch1a;
     private javax.swing.JTextField ch1b;
     private javax.swing.JTextField ch2a;
@@ -1723,10 +1699,10 @@ public class VibroGUI extends javax.swing.JFrame {
     protected javax.swing.JRadioButton outToDevice;
     protected javax.swing.JButton play;
     protected javax.swing.JProgressBar progress;
-    private javax.swing.JButton removeChannel;
     protected javax.swing.JRadioButton useMIDIDevice;
     protected javax.swing.JRadioButton useMIDIFile;
     protected javax.swing.JRadioButton useWaveFile;
+    private javax.swing.JRadioButton useWaveFile2;
     public javax.swing.JProgressBar visualBar1;
     public javax.swing.JProgressBar visualBar10;
     public javax.swing.JProgressBar visualBar11;
