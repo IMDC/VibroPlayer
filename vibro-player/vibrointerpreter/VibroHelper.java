@@ -87,7 +87,7 @@ public class VibroHelper{
                         double newVolumeAll = GUI.volumeSlider.getValue();
                         double [] newVolume = new double[numOutputs+1];
                         for (int k=0; k < numOutputs; k++) {
-                            newVolume[k+1]= GUI.sliders.get(k).getValue();
+                            newVolume[k+1]= GUI.getVolume(k);
                         }
                         //When a key is on
                         if (sm.getCommand() >= NOTE_ON_START && sm.getCommand() <= NOTE_ON_END) {
@@ -99,7 +99,7 @@ public class VibroHelper{
                             String noteName = NOTE_NAMES[note];
                             int velocity = sm.getData2();
                             System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity + "  Hz:"+keyHertz[key]);
-                            GUI.outText.setText("Note:"+noteName+" \tKey:"+key+" \tHertz:"+keyHertz[key]);
+                            GUI.outText.setText("Note:"+noteName+"  \tKey:"+key+"  \tHertz:"+keyHertz[key]);
                             velocity*=(newVolumeAll/100)*(newVolume[outputNum]/100);
                             outputValues[0]=velocity;
                             outputValues[outputNum]=velocity;
@@ -131,10 +131,9 @@ public class VibroHelper{
                         System.out.println("Other message: " + message.getClass());
                     }
                 }
-
-                System.out.println();
             } 
             isPlaying = false;
+            GUI.play.setText("START");
             }catch(Exception e){
                 System.out.println("error: "+e.toString());
                 isPlaying = false;
@@ -210,8 +209,8 @@ public class VibroHelper{
                 try {
                     for(int i=0; i<numOutputs; i++){
                         for ( int k = 0; k < GUI.listener.getBufferSize()/2; k++ ) {
-                            sampleWave[k] = (float) Math.sin ( outputValues[i+1] * Math.PI * k * 440.0 / GUI.listener.getSampleRate() 
-                                    * GUI.sliders.get(i).getValue()/100  *GUI.volumeSlider.getValue()/100);
+                            sampleWave[k] = (float) Math.sin ( outputValues[i+1] *k * 200.0 / GUI.listener.getSampleRate() 
+                                    * GUI.getVolume(i)/100  *GUI.volumeSlider.getValue()/100);
                         }
                         if (outputValues[i+1]!=0) GUI.listener.output ( i, sampleWave );
                     }               
@@ -276,12 +275,12 @@ public class VibroHelper{
         }
         return (key-minKey)/((maxKey-minKey)/numOutputs)+1;
     }
-    
+
     //reads decodes and plays a wav file to the specified input channel
     public void playWave(final int channel, final float[][]data){     
         Runnable playSound = new Runnable(){
             public void run(){
-                final int BUFFER_SIZE = 12800;
+                final int BUFFER_SIZE = 9000 ;//12800;
                 File soundFile = null;
                 AudioInputStream audioStream = null;
                 AudioFormat audioFormat;
@@ -343,14 +342,14 @@ public class VibroHelper{
                 while (nBytesRead != -1 && isPlaying) {
                     try {
                         nBytesRead = audioStream.read(abData, 0, abData.length);
-
+                        
                         // Calculate the number of frames actually read.
                         numFramesRead = nBytesRead / bytesPerFrame;
                         totalFramesRead += numFramesRead;
                         
                         //data for visualiser
-                        outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.sliders.get(chan-1).getValue()*GUI.volumeSlider.getValue())/50;
-                        outputValues[0]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.sliders.get(chan-1).getValue()*GUI.volumeSlider.getValue())/50;
+                        outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/50;
+                        outputValues[0]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/50;
                         GUI.progress.setValue(100*totalFramesRead/data[channel].length);
 
                         //output to device
@@ -358,13 +357,12 @@ public class VibroHelper{
                             delay=GUI.delayTuner.getValue();
                             sampleWave = new float[(int)(GUI.listener.getBufferSize())];
                             for ( int k = 0; k < sampleWave.length; k++ ) {
-                                sampleWave[k] = ( data[channel][totalFramesRead-(numFramesRead*delay)+(k*numFramesRead/sampleWave.length)]*GUI.sliders.get(chan-1).getValue()/100 *GUI.volumeSlider.getValue()/100);                                
+                                sampleWave[k] = ( data[channel][totalFramesRead+(k*numFramesRead/sampleWave.length)-(numFramesRead*delay)]*GUI.getVolume(chan-1)/100 *GUI.volumeSlider.getValue()/100);                                
                             }                            
                             GUI.listener.output ( chan-1, sampleWave );
                             Thread.sleep(sleepTime);
                             //AsioSoundHost.playWaveFile(data[channel]);
                         }
-
 
                     } 
                     catch (IOException e) {
@@ -375,13 +373,14 @@ public class VibroHelper{
                     } 
                     catch (InterruptedException ex) {
                         Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
-                    } catch (BufferOverflowException b){
-                        sleepTime++; 
+                    } 
+                    catch (BufferOverflowException b){
+                        sleepTime+=2; 
                         System.out.println("Warning Buffer overload..Sleep Time increased: "+sleepTime);
                     }
                     
                     if (nBytesRead >= 0) {
-                        @SuppressWarnings("unused")
+                        @SuppressWarnings("unused")                       
                         int nBytesWritten = sourceLine.write(abData, 0, nBytesRead);
                     }               
                 }
@@ -389,6 +388,7 @@ public class VibroHelper{
                 sourceLine.drain();
                 sourceLine.close();
                 isPlaying = false;
+                GUI.play.setText("START");
             }
         };        
         Thread playS = new Thread(playSound);
@@ -466,7 +466,7 @@ public class VibroHelper{
                     double newVolumeAll = GUI.volumeSlider.getValue();
                     double [] newVolume = new double[numOutputs+1];
                     for (int k=0; k < numOutputs; k++) {
-                        newVolume[k+1]= GUI.sliders.get(k).getValue();
+                        newVolume[k+1]= GUI.getVolume(k);
                     }
                     //When a key is pressed
                     if (sm.getCommand() >= NOTE_ON_START && sm.getCommand() <= NOTE_ON_END) {
@@ -476,7 +476,7 @@ public class VibroHelper{
                         int note = key % 12;
                         String noteName = NOTE_NAMES[note];
                         int velocity = sm.getData2();
-                        GUI.outText.setText("Note:"+noteName+" \tKey:"+key+" \tHertz:"+keyHertz[key]);
+                        GUI.outText.setText("Note:"+noteName+"  \tKey:"+key+"  \tHertz:"+keyHertz[key]);
                         velocity*=(newVolumeAll/100)*(newVolume[outputNum]/100);
                         outputValues[0]=velocity;
                         outputValues[outputNum]=velocity;    
