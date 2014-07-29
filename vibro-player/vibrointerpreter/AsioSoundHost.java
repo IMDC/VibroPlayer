@@ -39,7 +39,7 @@ public class AsioSoundHost implements AsioDriverListener {
             this.bufferSize = this.driver.getBufferPreferredSize();
             this.sampleRate = this.driver.getSampleRate();
             
-            this.activeChannels = new HashSet<>();
+            this.activeChannels = new HashSet();
             for ( int i = 0; i < 8; i++ ) {
                 activeChannels.add ( this.driver.getChannelOutput ( i ) );
             }

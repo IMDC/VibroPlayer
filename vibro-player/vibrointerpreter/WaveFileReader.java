@@ -64,13 +64,13 @@ public class WaveFileReader {
         this.blockAlign = 0;
         this.bitsPerSample = 0;
         this.subChunk2ID = "";
-        this.options = new ArrayList<>();
+        this.options = new ArrayList();
         this.subchunk2Size = 0;
         this.headerSize = 0;
         this.frameSize = 0;
         this.numSamples = 0;
         
-        this.samples = new ArrayList<>();
+        this.samples = new ArrayList();
         
         if ( !getAudioFormat() ) {
             /* Is it possible to get where is the error?! */

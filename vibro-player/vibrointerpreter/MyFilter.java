@@ -18,11 +18,11 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 
-class FreqFilter{
-    public static float[][] main(String[] args){
+class MyFilter{
+    public static float[][] main(String[] args,String mode){
         MWNumericArray n = null;
         Object[] result = null;
-        FrequencyFilter.Class1 theFilter = null;
+        Filter.Class1 theFilter = null;
         float[][] output = null;
         try{
             /* If no input, exit */
@@ -31,9 +31,11 @@ class FreqFilter{
                 return null;
             }
             init();
-            theFilter = new FrequencyFilter.Class1();
+            theFilter = new Filter.Class1();
             /* Convert Wave File into frequency data */
-            result = theFilter.FrequencyFilter(1,args[0]);
+            if(mode.equals("frequency")) result = theFilter.FrequencyFilter(1,args[0]);
+            else if(mode.equals("channel")) result = theFilter.ChannelFilter(1,args[0]);
+            else System.out.println("Second argument of Filter is invalid");
             MWNumericArray temp = (MWNumericArray)result[0];
             /* put the data into an array */
             float[][] out = (float[][])temp.toFloatArray();           

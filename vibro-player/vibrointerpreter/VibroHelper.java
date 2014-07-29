@@ -6,6 +6,7 @@
 
 package vibrointerpreter;
 
+import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
@@ -20,8 +21,12 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
+import javax.swing.ImageIcon;
 /**
- *
+ * -Designed to provide greater access to music for all people
+ * -Converts sound to vibrotactile information
+ * -When accompanied by visual information, it allows the hard of 
+ * hearing to experience the emotional and structural aspects of music
  * @author imdc
  */
 public class VibroHelper{
@@ -142,7 +147,7 @@ public class VibroHelper{
     };
     
     // initialize GUI volume bars then call midi reader to read the MIDI file
-    public void translate(File file, int tempo){
+    public void translate(File file, int tempo){       
         GUI.visualBar_volume.setMaximum(127);
         GUI.visualBar_volume.setMinimum(0);
         numOutputs = GUI.bars.size();
@@ -219,7 +224,7 @@ public class VibroHelper{
                     Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 catch (BufferOverflowException e) {
-                    if(sleepTime<2000)sleepTime++;
+                    if(sleepTime<1000)sleepTime++;
                     System.out.print("\tWarning Buffer overload..Sleep Time increased: "+sleepTime);              
                 }
             }
@@ -280,7 +285,7 @@ public class VibroHelper{
     public void playWave(final int channel, final float[][]data){     
         Runnable playSound = new Runnable(){
             public void run(){
-                final int BUFFER_SIZE = 9000 ;//12800;
+                final int BUFFER_SIZE = 8192;//9000 ;//12800;
                 File soundFile = null;
                 AudioInputStream audioStream = null;
                 AudioFormat audioFormat;
@@ -348,8 +353,8 @@ public class VibroHelper{
                         totalFramesRead += numFramesRead;
                         
                         //data for visualiser
-                        outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/50;
-                        outputValues[0]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/50;
+                        outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/10;
+                        outputValues[0]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/10;
                         GUI.progress.setValue(100*totalFramesRead/data[channel].length);
 
                         //output to device
@@ -357,7 +362,8 @@ public class VibroHelper{
                             delay=GUI.delayTuner.getValue();
                             sampleWave = new float[(int)(GUI.listener.getBufferSize())];
                             for ( int k = 0; k < sampleWave.length; k++ ) {
-                                sampleWave[k] = ( data[channel][totalFramesRead+(k*numFramesRead/sampleWave.length)-(numFramesRead*delay)]*GUI.getVolume(chan-1)/100 *GUI.volumeSlider.getValue()/100);                                
+                                sampleWave[k] = ( data[channel][totalFramesRead+(k*numFramesRead/sampleWave.length)-(numFramesRead*delay)]
+                                        *GUI.getVolume(chan-1)/100 *GUI.volumeSlider.getValue()/100);                                
                             }                            
                             GUI.listener.output ( chan-1, sampleWave );
                             Thread.sleep(sleepTime);
@@ -441,9 +447,10 @@ public class VibroHelper{
             this.name = name;
             for (int x = 0; x < 127; ++x){
                 keyHertz[x] = (float) (440*(Math.pow(2,(x-69)/12.0)));
-            }   
+            }       
         }
-        public void send(MidiMessage msg, long timeStamp) {    
+        public void send(MidiMessage msg, long timeStamp) {
+            this.close();
             try {
                 //create synthesizer for audio playback and initialize variables
                 Synthesizer synth = MidiSystem.getSynthesizer();
