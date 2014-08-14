@@ -6,7 +6,6 @@
 
 package vibrointerpreter;
 
-import java.awt.Image;
 import java.io.File;
 import java.io.IOException;
 import java.nio.BufferOverflowException;
@@ -21,7 +20,8 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.SourceDataLine;
-import javax.swing.ImageIcon;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.JProgressBar;
 /**
  * -Designed to provide greater access to music for all people
  * -Converts sound to vibrotactile information
@@ -37,7 +37,7 @@ public class VibroHelper{
     static boolean isPlaying =false;
     static VibroGUI GUI;
     static int[] outputValues = new int[MAX], volumes = new int[MAX];
-    static int arrangement = 0, TOP=2, BOTTOM=1, ALL=0;
+    static int arrangement = 0, TOP=2, BOTTOM=1, ALL=0, sleepTime;
     
     public VibroHelper(VibroGUI gui){
         GUI=gui;        
@@ -164,6 +164,7 @@ public class VibroHelper{
     
     //Controller for GUI graphics
     static Runnable slideAdjuster = new Runnable(){
+        @Override
         public void run(){
             int clock = 0;
             int thisThread = currThread;
@@ -196,24 +197,26 @@ public class VibroHelper{
                 if(!GUI.play.getText().equals("STOP")){
                     currThread++;
                     isPlaying=false;
-                }          
+                }
             }
             
-            for(int i=0; i<GUI.bars.size(); i++) GUI.bars.get(i).setValue(0); 
-            GUI.visualBar_volume.setValue(0);
+            for (JProgressBar bar : GUI.bars) { 
+                bar.setValue(0);
+            }
+            GUI.visualBar_volume.setValue(0);         
         }
     };
     
-    //Manage data to output device
+    //Manage data to output device from MIDI
     static Runnable outputManager = new Runnable(){
-        int sleepTime=0;
+        int sleepTime=40;
         public void run(){
             int thisThread = currThread;
             while(thisThread == currThread){ 
-                float[] sampleWave = new float[GUI.listener.getBufferSize()/2];
+                float[] sampleWave = new float[GUI.listener.getBufferSize()];
                 try {
                     for(int i=0; i<numOutputs; i++){
-                        for ( int k = 0; k < GUI.listener.getBufferSize()/2; k++ ) {
+                        for ( int k = 0; k < sampleWave.length; k++ ) {
                             sampleWave[k] = (float) Math.sin ( outputValues[i+1] *k * 200.0 / GUI.listener.getSampleRate() 
                                     * GUI.getVolume(i)/100  *GUI.volumeSlider.getValue()/100);
                         }
@@ -224,13 +227,26 @@ public class VibroHelper{
                     Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
                 }
                 catch (BufferOverflowException e) {
-                    if(sleepTime<1000)sleepTime++;
+                    if(sleepTime<2000)sleepTime++;
                     System.out.print("\tWarning Buffer overload..Sleep Time increased: "+sleepTime);              
                 }
             }
         }
     };
-    
+    //Manage data to output device from non-MIDI file
+    public static void outputManager2(final int chan, final float[] sampleWave){
+        Runnable outputAudio = new Runnable(){
+            public void run(){
+                try {
+                    GUI.listener.output ( chan, sampleWave );
+                } catch (InterruptedException ex) {
+                    Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            }
+        };
+        new Thread (outputAudio).start();
+    }
+      
     public static int getOutputNum(int key){
         if(numOutputs == 8){  
             if(GUI.enableBottom.isSelected())arrangement=TOP;
@@ -284,9 +300,10 @@ public class VibroHelper{
     //reads decodes and plays a wav file to the specified input channel
     public void playWave(final int channel, final float[][]data){     
         Runnable playSound = new Runnable(){
+            @Override
             public void run(){
-                final int BUFFER_SIZE = 8192;//9000 ;//12800;
-                File soundFile = null;
+                final int BUFFER_SIZE = GUI.bufferSize;
+                File soundFile;
                 AudioInputStream audioStream = null;
                 AudioFormat audioFormat;
                 SourceDataLine sourceLine = null;  
@@ -303,7 +320,10 @@ public class VibroHelper{
                 try {
                     soundFile = new File("temp"+channel+".wav");
                     audioStream = AudioSystem.getAudioInputStream(soundFile);
-                } catch (Exception e) {
+                } catch (UnsupportedAudioFileException e) {
+                    e.printStackTrace();
+                    System.exit(1);
+                } catch (IOException e) {
                     e.printStackTrace();
                     System.exit(1);
                 }
@@ -329,15 +349,12 @@ public class VibroHelper{
                 } catch (LineUnavailableException e) {
                     e.printStackTrace();
                     System.exit(1);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    System.exit(1);
                 }
 
                 sourceLine.start();                
                 
-                int delay = 4;//computer playback / output device playback delay (by framesize)
-                int sleepTime = 0;
+                int delay = 4;//computer playback / output device playback delay (by framesize)  
+                sleepTime = 0;
                 int nBytesRead = 0;
                 int numFramesRead = 0;
                 int bytesPerFrame = audioStream.getFormat().getFrameSize();
@@ -353,36 +370,43 @@ public class VibroHelper{
                         totalFramesRead += numFramesRead;
                         
                         //data for visualiser
-                        outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/10;
-                        outputValues[0]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * GUI.getVolume(chan-1)*GUI.volumeSlider.getValue())/10;
+                        int volume = GUI.getVolume(chan-1)*GUI.volumeSlider.getValue();
+                        outputValues[chan]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * volume)/10;
+                        outputValues[0]= (int)(Math.abs(data[channel][totalFramesRead-(numFramesRead*delay)]) * volume)/10;
                         GUI.progress.setValue(100*totalFramesRead/data[channel].length);
 
                         //output to device
                         if(GUI.outToDevice.isSelected() && GUI.driverLoaded ){ 
                             delay=GUI.delayTuner.getValue();
-                            sampleWave = new float[(int)(GUI.listener.getBufferSize())];
-                            for ( int k = 0; k < sampleWave.length; k++ ) {
-                                sampleWave[k] = ( data[channel][totalFramesRead+(k*numFramesRead/sampleWave.length)-(numFramesRead*delay)]
-                                        *GUI.getVolume(chan-1)/100 *GUI.volumeSlider.getValue()/100);                                
-                            }                            
-                            GUI.listener.output ( chan-1, sampleWave );
-                            Thread.sleep(sleepTime);
-                            //AsioSoundHost.playWaveFile(data[channel]);
-                        }
-
+                            sampleWave = new float[GUI.listener.getBufferSize()];
+                            for(int j=0; j<numFramesRead/sampleWave.length;j++){
+                                for ( int k = 0; k < sampleWave.length; k++ ) {
+                                    sampleWave[k] = ( data[channel][totalFramesRead+(j*sampleWave.length+k)-(numFramesRead*delay)]
+                                            *volume/10000);  
+                                    sampleWave[k] = (float) Math.sin ( k * 2000.0 / GUI.listener.getSampleRate() 
+                                    * volume/1000);
+                                }
+                                //outputManager2(chan-1,sampleWave);                            
+                                GUI.listener.output ( chan-1, sampleWave );
+                                Thread.sleep(sleepTime);
+                            }
+                            //AsioSoundHost.playWaveFile(data[channel]);                            
+                        }                        
                     } 
                     catch (IOException e) {
                         e.printStackTrace();
                     } 
                     catch (ArrayIndexOutOfBoundsException a) {
-                        System.out.println("Delay of "+delay);
+                        //System.out.println("Delay of "+delay);
                     } 
                     catch (InterruptedException ex) {
                         Logger.getLogger(VibroHelper.class.getName()).log(Level.SEVERE, null, ex);
                     } 
                     catch (BufferOverflowException b){
-                        sleepTime+=2; 
-                        System.out.println("Warning Buffer overload..Sleep Time increased: "+sleepTime);
+                        if(channel==1){
+                            sleepTime+=1;
+                            System.out.println("Warning Buffer overload: "+sleepTime);
+                        }
                     }
                     
                     if (nBytesRead >= 0) {
@@ -397,10 +421,8 @@ public class VibroHelper{
                 GUI.play.setText("START");
             }
         };        
-        Thread playS = new Thread(playSound);
-        playS.start();
-        Thread thread = new Thread(slideAdjuster);
-        thread.start();
+        new Thread(playSound).start();
+        new Thread(slideAdjuster).start();
         
     }
         
@@ -434,8 +456,7 @@ public class VibroHelper{
                     GUI.bars.get(j).setMaximum(127);
                     GUI.bars.get(j).setMinimum(0);
                 }
-                Thread thread2 = new Thread(slideAdjuster);
-                thread2.start();
+                new Thread(slideAdjuster).start();
             } catch (MidiUnavailableException e) {}
         }
     }
@@ -464,8 +485,7 @@ public class VibroHelper{
                 
                 if(GUI.outToDevice.isSelected() && GUI.driverLoaded ){
                     //activate output manager
-                    Thread thread3 = new Thread(outputManager);                   
-                    thread3.start();                                       
+                    new Thread(outputManager).start();                                       
                 }
                                 
                 if (msg instanceof ShortMessage){
@@ -486,7 +506,9 @@ public class VibroHelper{
                         GUI.outText.setText("Note:"+noteName+"  \tKey:"+key+"  \tHertz:"+keyHertz[key]);
                         velocity*=(newVolumeAll/100)*(newVolume[outputNum]/100);
                         outputValues[0]=velocity;
-                        outputValues[outputNum]=velocity;    
+                        //outputValues[outputNum]=velocity;//
+                        if(velocity!=0)outputValues[outputNum]=(key%8)+1;
+                        else outputValues[outputNum]=0;
                         System.out.println("Note on, " + noteName + octave + " key=" + key + " velocity: " + velocity + "  Hz:"+keyHertz[key]);
                         channels[sm.getChannel()].noteOn( key, velocity );
                     } 

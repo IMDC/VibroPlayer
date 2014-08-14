@@ -28,8 +28,7 @@ public class VibroGUI extends javax.swing.JFrame {
     
     boolean fileFound = false;
     JFileChooser c = new JFileChooser();
-    int numChannels = 8, solo=0;
-    //MidiKeyboard kb = new MidiKeyboard();
+    int numChannels = 8, solo=0, bufferSize=16384;
       
     ArrayList <JProgressBar> bars = new ArrayList();
     ArrayList <JSlider> sliders = new ArrayList();
@@ -233,6 +232,7 @@ public class VibroGUI extends javax.swing.JFrame {
 
         inputGroup = new javax.swing.ButtonGroup();
         channelEnable = new javax.swing.ButtonGroup();
+        bufferSizeGroup = new javax.swing.ButtonGroup();
         freqSplitControl = new javax.swing.JDialog();
         ch1a = new javax.swing.JTextField();
         ch1b = new javax.swing.JTextField();
@@ -396,10 +396,15 @@ public class VibroGUI extends javax.swing.JFrame {
         iconLabel = new javax.swing.JLabel();
         jMenuBar1 = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
         enableAll = new javax.swing.JCheckBoxMenuItem();
         enableTop = new javax.swing.JCheckBoxMenuItem();
         enableBottom = new javax.swing.JCheckBoxMenuItem();
+        jMenu2 = new javax.swing.JMenu();
+        bufferMenuItem1 = new javax.swing.JCheckBoxMenuItem();
+        bufferMenuItem2 = new javax.swing.JCheckBoxMenuItem();
+        bufferMenuItem3 = new javax.swing.JCheckBoxMenuItem();
+        bufferMenuItem4 = new javax.swing.JCheckBoxMenuItem();
+        jMenu3 = new javax.swing.JMenu();
 
         freqSplitControl.setTitle("Frequency Split Control");
         freqSplitControl.setMinimumSize(new java.awt.Dimension(540, 200));
@@ -679,10 +684,10 @@ public class VibroGUI extends javax.swing.JFrame {
         });
 
         inputGroup.add(useWaveFile);
+        useWaveFile.setSelected(true);
         useWaveFile.setText("Input: MP3/Wave  (Frequency Split)");
 
         inputGroup.add(useWaveFile2);
-        useWaveFile2.setSelected(true);
         useWaveFile2.setText("Input: MP3/Wave  (Channel Split)");
 
         latencyPanel.setBorder(javax.swing.BorderFactory.createTitledBorder("Latency Tuner"));
@@ -692,7 +697,6 @@ public class VibroGUI extends javax.swing.JFrame {
         delayTuner.setMinimum(-2);
         delayTuner.setMinorTickSpacing(1);
         delayTuner.setPaintTicks(true);
-        delayTuner.setToolTipText("");
         delayTuner.setValue(3);
 
         javax.swing.GroupLayout latencyPanelLayout = new javax.swing.GroupLayout(latencyPanel);
@@ -825,8 +829,8 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(volPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(volPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar_volume, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                    .addComponent(volumeSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE))
+                    .addComponent(visualBar_volume, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+                    .addComponent(volumeSlider, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(volfooter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -918,8 +922,8 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                    .addComponent(volumeSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE))
+                    .addComponent(visualBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+                    .addComponent(volumeSlider1, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1013,8 +1017,8 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                    .addComponent(volumeSlider2, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
+                    .addComponent(visualBar2, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                    .addComponent(volumeSlider2, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1106,7 +1110,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar3, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                    .addComponent(visualBar3, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
                     .addComponent(volumeSlider3, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1201,7 +1205,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel4Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar4, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addComponent(visualBar4, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(volumeSlider4, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1294,7 +1298,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel5Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar5, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                    .addComponent(visualBar5, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
                     .addComponent(volumeSlider5, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1389,7 +1393,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar6, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addComponent(visualBar6, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(volumeSlider6, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1482,7 +1486,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel7Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel7Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar7, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                    .addComponent(visualBar7, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
                     .addComponent(volumeSlider7, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter7, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1577,7 +1581,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel8Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel8Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar8, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addComponent(visualBar8, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(volumeSlider8, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter8, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1670,8 +1674,8 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel9Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel9Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar9, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
-                    .addComponent(volumeSlider9, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE))
+                    .addComponent(visualBar9, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
+                    .addComponent(volumeSlider9, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter9, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1765,8 +1769,8 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel10Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel10Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar10, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
-                    .addComponent(volumeSlider10, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE))
+                    .addComponent(visualBar10, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+                    .addComponent(volumeSlider10, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -1858,7 +1862,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel11Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel11Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar11, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                    .addComponent(visualBar11, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
                     .addComponent(volumeSlider11, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter11, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -1953,7 +1957,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel12Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel12Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar12, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addComponent(visualBar12, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(volumeSlider12, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter12, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2046,7 +2050,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel13Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel13Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar13, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                    .addComponent(visualBar13, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
                     .addComponent(volumeSlider13, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter13, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2141,7 +2145,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel14Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel14Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar14, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addComponent(visualBar14, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(volumeSlider14, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter14, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2234,7 +2238,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(chanPanel15Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel15Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar15, javax.swing.GroupLayout.DEFAULT_SIZE, 176, Short.MAX_VALUE)
+                    .addComponent(visualBar15, javax.swing.GroupLayout.DEFAULT_SIZE, 166, Short.MAX_VALUE)
                     .addComponent(volumeSlider15, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter15, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2329,7 +2333,7 @@ public class VibroGUI extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, chanPanel16Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(chanPanel16Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(visualBar16, javax.swing.GroupLayout.DEFAULT_SIZE, 175, Short.MAX_VALUE)
+                    .addComponent(visualBar16, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
                     .addComponent(volumeSlider16, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chFooter16, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2384,21 +2388,21 @@ public class VibroGUI extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(chanPanel16, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel15, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(chanPanel14, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel13, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(chanPanel12, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel11, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(chanPanel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel9, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(chanPanel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel7, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(chanPanel6, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(chanPanel4, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(chanPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(chanPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 244, Short.MAX_VALUE)
+                    .addComponent(chanPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 234, Short.MAX_VALUE)
                     .addComponent(volPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -2426,15 +2430,8 @@ public class VibroGUI extends javax.swing.JFrame {
                 .addContainerGap())
         );
 
-        jMenu1.setText("Menu");
-
-        jMenuItem1.setText("Frequency Split Control");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jMenu1.add(jMenuItem1);
+        jMenu1.setText("Channel Configuration");
+        jMenu1.setToolTipText("Output to only Top/Bottom Channels");
 
         channelEnable.add(enableAll);
         enableAll.setSelected(true);
@@ -2460,6 +2457,58 @@ public class VibroGUI extends javax.swing.JFrame {
         jMenu1.add(enableBottom);
 
         jMenuBar1.add(jMenu1);
+
+        jMenu2.setText("Buffer Size");
+        jMenu2.setToolTipText("A smaller buffer size will result in a smoother sound, but will make your computer slower and more vulnerable to overload ");
+
+        bufferSizeGroup.add(bufferMenuItem1);
+        bufferMenuItem1.setText("2048");
+        bufferMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bufferMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(bufferMenuItem1);
+
+        bufferSizeGroup.add(bufferMenuItem2);
+        bufferMenuItem2.setText("4096");
+        bufferMenuItem2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bufferMenuItem2ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(bufferMenuItem2);
+
+        bufferSizeGroup.add(bufferMenuItem3);
+        bufferMenuItem3.setSelected(true);
+        bufferMenuItem3.setText("8192");
+        bufferMenuItem3.setToolTipText("recomended");
+        bufferMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bufferMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(bufferMenuItem3);
+
+        bufferSizeGroup.add(bufferMenuItem4);
+        bufferMenuItem4.setText("16384");
+        bufferMenuItem4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bufferMenuItem4ActionPerformed(evt);
+            }
+        });
+        jMenu2.add(bufferMenuItem4);
+
+        jMenuBar1.add(jMenu2);
+
+        jMenu3.setText("Frequency Control");
+        jMenu3.setToolTipText("Modify Frequency Split values");
+        jMenu3.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jMenu3MouseClicked(evt);
+            }
+        });
+        jMenuBar1.add(jMenu3);
 
         setJMenuBar(jMenuBar1);
 
@@ -2591,11 +2640,6 @@ public class VibroGUI extends javax.swing.JFrame {
     private void ch8aActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ch8aActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_ch8aActionPerformed
-
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
-        // TODO add your handling code here:
-        freqSplitControl.setVisible(true);
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
 
     private void freqSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_freqSaveActionPerformed
         // TODO add your handling code here:
@@ -2791,6 +2835,31 @@ public class VibroGUI extends javax.swing.JFrame {
          setMuteSolo(15,true);
     }//GEN-LAST:event_solo15ActionPerformed
 
+    private void jMenu3MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jMenu3MouseClicked
+        // TODO add your handling code here:
+        freqSplitControl.setVisible(true);
+    }//GEN-LAST:event_jMenu3MouseClicked
+
+    private void bufferMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bufferMenuItem1ActionPerformed
+        // TODO add your handling code here:
+        bufferSize=2048;
+    }//GEN-LAST:event_bufferMenuItem1ActionPerformed
+
+    private void bufferMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bufferMenuItem2ActionPerformed
+        // TODO add your handling code here:
+        bufferSize=4096;
+    }//GEN-LAST:event_bufferMenuItem2ActionPerformed
+
+    private void bufferMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bufferMenuItem3ActionPerformed
+        // TODO add your handling code here:
+        bufferSize=8192;
+    }//GEN-LAST:event_bufferMenuItem3ActionPerformed
+
+    private void bufferMenuItem4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bufferMenuItem4ActionPerformed
+        // TODO add your handling code here:
+        bufferSize=16384;
+    }//GEN-LAST:event_bufferMenuItem4ActionPerformed
+
     /**
      * @param args the command line arguments
      */
@@ -2827,6 +2896,11 @@ public class VibroGUI extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBoxMenuItem bufferMenuItem1;
+    private javax.swing.JCheckBoxMenuItem bufferMenuItem2;
+    private javax.swing.JCheckBoxMenuItem bufferMenuItem3;
+    private javax.swing.JCheckBoxMenuItem bufferMenuItem4;
+    private javax.swing.ButtonGroup bufferSizeGroup;
     private javax.swing.JTextField ch1a;
     private javax.swing.JTextField ch1b;
     private javax.swing.JTextField ch2a;
@@ -2913,8 +2987,9 @@ public class VibroGUI extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JMenu jMenu1;
+    private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenuBar jMenuBar1;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;

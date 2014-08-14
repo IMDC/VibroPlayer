@@ -6,6 +6,8 @@
     </Component>
     <Component class="javax.swing.ButtonGroup" name="channelEnable">
     </Component>
+    <Component class="javax.swing.ButtonGroup" name="bufferSizeGroup">
+    </Component>
     <Container class="javax.swing.JDialog" name="freqSplitControl">
       <Properties>
         <Property name="title" type="java.lang.String" value="Frequency Split Control"/>
@@ -417,17 +419,10 @@
       <SubComponents>
         <Menu class="javax.swing.JMenu" name="jMenu1">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Menu"/>
+            <Property name="text" type="java.lang.String" value="Channel Configuration"/>
+            <Property name="toolTipText" type="java.lang.String" value="Output to only Top/Bottom Channels"/>
           </Properties>
           <SubComponents>
-            <MenuItem class="javax.swing.JMenuItem" name="jMenuItem1">
-              <Properties>
-                <Property name="text" type="java.lang.String" value="Frequency Split Control"/>
-              </Properties>
-              <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jMenuItem1ActionPerformed"/>
-              </Events>
-            </MenuItem>
             <MenuItem class="javax.swing.JCheckBoxMenuItem" name="enableAll">
               <Properties>
                 <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
@@ -466,6 +461,69 @@
               </AuxValues>
             </MenuItem>
           </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="jMenu2">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Buffer Size"/>
+            <Property name="toolTipText" type="java.lang.String" value="A smaller buffer size will result in a smoother sound, but will make your computer slower and more vulnerable to overload "/>
+          </Properties>
+          <SubComponents>
+            <MenuItem class="javax.swing.JCheckBoxMenuItem" name="bufferMenuItem1">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="bufferSizeGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="2048"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bufferMenuItem1ActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JCheckBoxMenuItem" name="bufferMenuItem2">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="bufferSizeGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="4096"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bufferMenuItem2ActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JCheckBoxMenuItem" name="bufferMenuItem3">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="bufferSizeGroup"/>
+                </Property>
+                <Property name="selected" type="boolean" value="true"/>
+                <Property name="text" type="java.lang.String" value="8192"/>
+                <Property name="toolTipText" type="java.lang.String" value="recomended"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bufferMenuItem3ActionPerformed"/>
+              </Events>
+            </MenuItem>
+            <MenuItem class="javax.swing.JCheckBoxMenuItem" name="bufferMenuItem4">
+              <Properties>
+                <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
+                  <ComponentRef name="bufferSizeGroup"/>
+                </Property>
+                <Property name="text" type="java.lang.String" value="16384"/>
+              </Properties>
+              <Events>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="bufferMenuItem4ActionPerformed"/>
+              </Events>
+            </MenuItem>
+          </SubComponents>
+        </Menu>
+        <Menu class="javax.swing.JMenu" name="jMenu3">
+          <Properties>
+            <Property name="text" type="java.lang.String" value="Frequency Control"/>
+            <Property name="toolTipText" type="java.lang.String" value="Modify Frequency Split values"/>
+          </Properties>
+          <Events>
+            <EventHandler event="mouseClicked" listener="java.awt.event.MouseListener" parameters="java.awt.event.MouseEvent" handler="jMenu3MouseClicked"/>
+          </Events>
         </Menu>
       </SubComponents>
     </Menu>
@@ -669,6 +727,7 @@
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="inputGroup"/>
             </Property>
+            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Input: MP3/Wave  (Frequency Split)"/>
           </Properties>
           <AuxValues>
@@ -680,7 +739,6 @@
             <Property name="buttonGroup" type="javax.swing.ButtonGroup" editor="org.netbeans.modules.form.RADComponent$ButtonGroupPropertyEditor">
               <ComponentRef name="inputGroup"/>
             </Property>
-            <Property name="selected" type="boolean" value="true"/>
             <Property name="text" type="java.lang.String" value="Input: MP3/Wave  (Channel Split)"/>
           </Properties>
         </Component>
@@ -720,7 +778,6 @@
                 <Property name="minimum" type="int" value="-2"/>
                 <Property name="minorTickSpacing" type="int" value="1"/>
                 <Property name="paintTicks" type="boolean" value="true"/>
-                <Property name="toolTipText" type="java.lang.String" value=""/>
                 <Property name="value" type="int" value="3"/>
               </Properties>
               <AuxValues>
@@ -786,21 +843,21 @@
                   <EmptySpace max="-2" attributes="0"/>
                   <Group type="103" groupAlignment="0" attributes="0">
                       <Component id="chanPanel16" alignment="0" max="32767" attributes="0"/>
-                      <Component id="chanPanel15" alignment="0" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel15" alignment="0" pref="234" max="32767" attributes="0"/>
                       <Component id="chanPanel14" alignment="0" max="32767" attributes="0"/>
-                      <Component id="chanPanel13" alignment="0" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel13" alignment="0" pref="234" max="32767" attributes="0"/>
                       <Component id="chanPanel12" alignment="0" max="32767" attributes="0"/>
-                      <Component id="chanPanel11" alignment="0" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel11" alignment="0" pref="234" max="32767" attributes="0"/>
                       <Component id="chanPanel10" alignment="0" max="32767" attributes="0"/>
-                      <Component id="chanPanel9" alignment="0" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel9" alignment="0" pref="234" max="32767" attributes="0"/>
                       <Component id="chanPanel8" alignment="0" max="32767" attributes="0"/>
-                      <Component id="chanPanel7" alignment="0" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel7" alignment="0" pref="234" max="32767" attributes="0"/>
                       <Component id="chanPanel6" alignment="0" max="32767" attributes="0"/>
-                      <Component id="chanPanel5" alignment="0" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel5" alignment="0" pref="234" max="32767" attributes="0"/>
                       <Component id="chanPanel4" alignment="0" max="32767" attributes="0"/>
-                      <Component id="chanPanel3" alignment="0" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel3" alignment="0" pref="234" max="32767" attributes="0"/>
                       <Component id="chanPanel2" max="32767" attributes="0"/>
-                      <Component id="chanPanel1" pref="244" max="32767" attributes="0"/>
+                      <Component id="chanPanel1" pref="234" max="32767" attributes="0"/>
                       <Component id="volPanel" alignment="0" max="32767" attributes="0"/>
                   </Group>
                   <EmptySpace max="-2" attributes="0"/>
@@ -844,8 +901,8 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar_volume" pref="176" max="32767" attributes="0"/>
-                          <Component id="volumeSlider" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar_volume" pref="166" max="32767" attributes="0"/>
+                          <Component id="volumeSlider" pref="166" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="volfooter" min="-2" max="-2" attributes="0"/>
@@ -988,8 +1045,8 @@
                   <Group type="102" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar1" pref="176" max="32767" attributes="0"/>
-                          <Component id="volumeSlider1" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar1" pref="166" max="32767" attributes="0"/>
+                          <Component id="volumeSlider1" pref="166" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chFooter1" min="-2" max="-2" attributes="0"/>
@@ -1149,8 +1206,8 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar2" pref="175" max="32767" attributes="0"/>
-                          <Component id="volumeSlider2" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar2" pref="165" max="32767" attributes="0"/>
+                          <Component id="volumeSlider2" pref="165" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="chFooter2" min="-2" max="-2" attributes="0"/>
@@ -1318,7 +1375,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar3" alignment="0" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar3" alignment="0" pref="166" max="32767" attributes="0"/>
                           <Component id="volumeSlider3" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1479,7 +1536,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar4" alignment="0" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar4" alignment="0" pref="165" max="32767" attributes="0"/>
                           <Component id="volumeSlider4" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -1648,7 +1705,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar5" alignment="0" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar5" alignment="0" pref="166" max="32767" attributes="0"/>
                           <Component id="volumeSlider5" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -1809,7 +1866,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar6" alignment="0" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar6" alignment="0" pref="165" max="32767" attributes="0"/>
                           <Component id="volumeSlider6" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -1978,7 +2035,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar7" alignment="0" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar7" alignment="0" pref="166" max="32767" attributes="0"/>
                           <Component id="volumeSlider7" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -2139,7 +2196,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar8" alignment="0" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar8" alignment="0" pref="165" max="32767" attributes="0"/>
                           <Component id="volumeSlider8" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -2308,8 +2365,8 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar9" alignment="0" pref="176" max="32767" attributes="0"/>
-                          <Component id="volumeSlider9" alignment="0" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar9" alignment="0" pref="166" max="32767" attributes="0"/>
+                          <Component id="volumeSlider9" alignment="0" pref="166" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="chFooter9" min="-2" max="-2" attributes="0"/>
@@ -2469,8 +2526,8 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar10" alignment="0" pref="175" max="32767" attributes="0"/>
-                          <Component id="volumeSlider10" alignment="0" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar10" alignment="0" pref="165" max="32767" attributes="0"/>
+                          <Component id="volumeSlider10" alignment="0" pref="165" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Component id="chFooter10" min="-2" max="-2" attributes="0"/>
@@ -2638,7 +2695,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar11" alignment="0" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar11" alignment="0" pref="166" max="32767" attributes="0"/>
                           <Component id="volumeSlider11" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -2799,7 +2856,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar12" alignment="0" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar12" alignment="0" pref="165" max="32767" attributes="0"/>
                           <Component id="volumeSlider12" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -2968,7 +3025,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar13" alignment="0" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar13" alignment="0" pref="166" max="32767" attributes="0"/>
                           <Component id="volumeSlider13" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -3129,7 +3186,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar14" alignment="0" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar14" alignment="0" pref="165" max="32767" attributes="0"/>
                           <Component id="volumeSlider14" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>
@@ -3298,7 +3355,7 @@
                   <Group type="102" alignment="0" attributes="0">
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar15" alignment="0" pref="176" max="32767" attributes="0"/>
+                          <Component id="visualBar15" alignment="0" pref="166" max="32767" attributes="0"/>
                           <Component id="volumeSlider15" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -3459,7 +3516,7 @@
                   <Group type="102" alignment="1" attributes="0">
                       <EmptySpace min="-2" max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="visualBar16" alignment="0" pref="175" max="32767" attributes="0"/>
+                          <Component id="visualBar16" alignment="0" pref="165" max="32767" attributes="0"/>
                           <Component id="volumeSlider16" alignment="0" pref="0" max="32767" attributes="0"/>
                       </Group>
                       <EmptySpace min="-2" max="-2" attributes="0"/>

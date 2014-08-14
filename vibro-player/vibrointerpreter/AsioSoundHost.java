@@ -53,7 +53,7 @@ public class AsioSoundHost implements AsioDriverListener {
         }
     }
     
-    public void bufferSwitch ( long systemTime, long samplePosition, Set<AsioChannel> channels ) {
+    public void bufferSwitch ( long systemTime, long samplePosition, Set<AsioChannel> channels ) {        
         if ( play ) {
             //should load the samples and play it
             for ( int i = 0; i < this.bufferSize; i++, currentSample++ ) {
@@ -116,10 +116,10 @@ public class AsioSoundHost implements AsioDriverListener {
     public int getBufferSize() {
         return this.bufferSize;
     }
-    
-    public void output ( int channel, float[] output ) {
+   
+    public void output ( int channel, float[] output ) throws InterruptedException {
         for ( AsioChannel channelInfo: this.activeChannels ) {
-            if ( channelInfo.getChannelIndex() == channel ) {
+            if ( channelInfo.getChannelIndex() == channel ) {                      
                 channelInfo.write ( output );
             }
         }

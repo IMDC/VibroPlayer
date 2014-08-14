@@ -258,7 +258,7 @@ public class AsioChannel {
       case ASIOSTInt32MSB:
       case ASIOSTInt32LSB: {
         for (float sampleValue : output) {
-          outputBuffer.putInt((int) (sampleValue * MAX_INT32));          
+          outputBuffer.putInt((int) (sampleValue * MAX_INT32));
         }
         break;
       }
@@ -332,7 +332,7 @@ public class AsioChannel {
    * then the buffer will be incompletely read.
    * @param input  A <code>float</code> array to read into.
    */
-  public void read(float[] input) {
+  public void read(float[] input) {     
     if (!isInput) {
       throw new IllegalStateException("Only input channels can be read from.");
     }
@@ -358,7 +358,7 @@ public class AsioChannel {
       case ASIOSTInt32MSB:
       case ASIOSTInt32LSB: {
         for (int i = 0; i < input.length; i++) {
-          input[i] = ((float) inputBuffer.getInt()) / MAX_INT32;          
+          input[i] = ((float) inputBuffer.getInt()) / MAX_INT32;
         }
         break;
       }
