@@ -256,10 +256,10 @@ public class AsioChannel {
         break;
       }
       case ASIOSTInt32MSB:
-      case ASIOSTInt32LSB: {
+      case ASIOSTInt32LSB: {        
         for (float sampleValue : output) {
           outputBuffer.putInt((int) (sampleValue * MAX_INT32));
-        }
+        }       
         break;
       }
       case ASIOSTInt32MSB16:

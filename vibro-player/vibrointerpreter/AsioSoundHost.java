@@ -7,6 +7,8 @@ import com.synthbot.jasiohost.AsioDriverListener;
 import com.synthbot.jasiohost.AsioDriverState;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -25,11 +27,12 @@ public class AsioSoundHost implements AsioDriverListener {
     private double sampleRate;
     private Set<AsioChannel> activeChannels;
     
-    private static float[] waveFile;
+    private static float[][] waveFile;
     private static boolean play = false;
-    private int currentSample;
+    private int currentSample, volume;
     
     private float out[];
+    private float chan[][];
     
     public AsioSoundHost ( AsioDriver driver ) {
         if ( driver != null ) {
@@ -49,32 +52,42 @@ public class AsioSoundHost implements AsioDriverListener {
             play = false;
             currentSample = 0;
             
+            chan = new float[9][];
             out = new float[this.bufferSize];
+            for (int n = 0; n<8; n++){
+                chan[n]=out;
+            }
+            
         }
     }
     
     public void bufferSwitch ( long systemTime, long samplePosition, Set<AsioChannel> channels ) {        
         if ( play ) {
             //should load the samples and play it
-            for ( int i = 0; i < this.bufferSize; i++, currentSample++ ) {
-                if ( currentSample < waveFile.length ) {
-                    out[i] = waveFile[currentSample];
+            int max = waveFile.length;
+            for (int n = 0; n<max; n++){
+                for ( int i = 0; i < this.bufferSize; i++, currentSample++ ) {
+                    if ( currentSample < waveFile[n].length ) {
+                        chan[n][i] = waveFile[n][currentSample]*volume/10000;
+                    }
+                    else {
+                        chan[n][i] = 0;
+                    }
                 }
-                else {
-                    out[i] = 0;
+                for ( AsioChannel channelInfo : channels ) {
+                    if ( channelInfo.getChannelIndex() == n+1 ) {
+                        channelInfo.write (chan[n]);
+                    }
                 }
             }
-
-            for ( AsioChannel channelInfo : channels ) {
-                if ( channelInfo.getChannelIndex() != 0 ) {
-                    channelInfo.write ( out);
-                }
-            }
-        }
-        
+        }        
     }
     
-    public static void playWaveFile ( float[] file ) {
+    public void setVolume(int vol){
+        volume=vol;
+    }
+        
+    public static void playWaveFile ( float[][] file ) {
         play = true;
         waveFile = file;
     }
@@ -119,7 +132,7 @@ public class AsioSoundHost implements AsioDriverListener {
    
     public void output ( int channel, float[] output ) throws InterruptedException {
         for ( AsioChannel channelInfo: this.activeChannels ) {
-            if ( channelInfo.getChannelIndex() == channel ) {                      
+            if ( channelInfo.getChannelIndex() == channel ) {                 
                 channelInfo.write ( output );
             }
         }

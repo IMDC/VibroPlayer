@@ -19,22 +19,22 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 class MyFilter{
-    public static float[][] main(String[] args,String mode){
+    public static float[][] main(String arg,String mode){
         MWNumericArray n = null;
         Object[] result = null;
         Filter.Class1 theFilter = null;
         float[][] output = null;
         try{
             /* If no input, exit */
-            if (args.length == 0){
+            if (arg==null){
                 System.out.println("Error: must enter file");
                 return null;
             }
             init();
             theFilter = new Filter.Class1();
             /* Convert Wave File into frequency data */
-            if(mode.equals("frequency")) result = theFilter.FrequencyFilter(1,args[0]);
-            else if(mode.equals("channel")) result = theFilter.ChannelFilter(1,args[0]);
+            if(mode.equals("frequency")) result = theFilter.FrequencyFilter(1,arg);
+            else if(mode.equals("channel")) result = theFilter.ChannelFilter(1,arg);
             else System.out.println("Second argument of Filter is invalid");
             MWNumericArray temp = (MWNumericArray)result[0];
             /* put the data into an array */
